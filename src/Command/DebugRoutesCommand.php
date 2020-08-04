@@ -1,18 +1,24 @@
 <?php
 
-namespace MyConsole\Command;
+namespace LmConsole\Command;
 
+use \Laminas\Cli\ContainerResolver;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DebugRoutes extends Command
+class DebugRoutesCommand extends Command
 {
     /**
      * @var string $defaultName Name of command
      */
     protected static $defaultName = 'debug:routes';
+
+    /**
+     * 
+     */
+    protected static $defaultArgument = '[route_name]';
 
     /**
      * Execute action
@@ -21,6 +27,7 @@ class DebugRoutes extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
+        $routes = $this->getRoutes($input);
         if ($input->hasArgument('route_name') && isset($routes[$input->getArgument('route_name')])) {
             $routes = $routes[$input->getArgument('route_name')];
         }
@@ -82,14 +89,14 @@ class DebugRoutes extends Command
     protected function getConfig(): ?array
     {
         // Services
-        if (!$container = \Laminas\Cli\ContainerResolver::resolve()) {
+        if (!$container = ContainerResolver::resolve()) {
             return null;
         }
         return $container->get('config');
     }
 
     /**
-     * @throw \RuntimeException
+     * @throws \RuntimeException
      */
     protected function getData(string $routeName, array $routeData): array
     {

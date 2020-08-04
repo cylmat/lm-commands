@@ -1,14 +1,13 @@
 <?php
 
-namespace MyConsole;
+namespace LmConsole;
 
 class ConfigProvider
 {
     public function __invoke(): array
     {
         return [
-            'laminas-cli' => $this->getCliConfig(),
-            'dependencies' => $this->getDependencyConfig(),
+            'laminas-cli' => $this->getCliConfig()
         ];
     }
 
@@ -16,21 +15,7 @@ class ConfigProvider
     {
         return [
             'commands' => [
-                'debug:routes [module]'         => Command\DebugRoutes::class,
-
-                'model:generate:crud'           => Command\ModelGenerateCrud::class,
-                'model:generate:access'         => Command\ModelGenerateAccess::class,
-
-                'module:create'   => Command\ModuleCreate::class
-            ]
-        ];
-    }
-
-    public function getDependencyConfig(): array
-    {
-        return [
-            'factories' => [
-                
+                'debug:routes [module]' => Command\DebugRoutesCommand::class
             ]
         ];
     }
