@@ -14,10 +14,9 @@ class DebugRoutesCommandTest extends \PHPUnit\Framework\TestCase
     public function testExecute()
     {
         $command = new DebugRoutesCommand;
-        //$def = new \Symfony\Component\Console\InputDefinition;
         $input = new ArrayInput([
             'command' => 'debug:routes', 
-            'route_name' => 'foo'
+            'route_name' => 'test1'
         ], new InputDefinition([
                 new InputArgument('command', InputArgument::REQUIRED),
                 new InputArgument('route_name', InputArgument::REQUIRED)
@@ -25,6 +24,8 @@ class DebugRoutesCommandTest extends \PHPUnit\Framework\TestCase
         );
         $output = new \Symfony\Component\Console\Output\BufferedOutput;
         $command->execute($input, $output);
-        $this->assertTrue(true);
+        echo "\n".$output->fetch();
+
+        $this->expectOutputRegex("/testing-url-1/");
     }
 }

@@ -27,11 +27,11 @@ class DebugRoutesCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $routes = $this->getRoutes($input);
+        $routes = $defined_routes = $this->getRoutes($input);
+
         if ($input->hasArgument('route_name') && isset($routes[$input->getArgument('route_name')])) {
             $routes = $routes[$input->getArgument('route_name')];
         }
-        $defined_routes = $this->getRoutes($input);
         $output->writeln(["<comment>\t - Routes of application</comment>","============"]);
         
         foreach ($defined_routes as $i => $route) {
@@ -63,6 +63,7 @@ class DebugRoutesCommand extends Command
      * Get container configuration
      * 
      * @param InputInterface $input
+     * @throws \RuntimeException
      */
     protected function getRoutes(InputInterface $input): array
     {
@@ -70,48 +71,65 @@ class DebugRoutesCommand extends Command
         $router = $this->getFoundChild('router', $config);
         $all_routes = $this->getFoundChild('routes', $router);
         
+        if (!$all_routes) {
+            throw new \RuntimeException("Routes are not defined in configuration file.");
+        }
+
         $routeStack = [];
         $route_name = $input->getArgument('route_name');
+
+        // For a single defined route passed in Input
         if ($route_name && isset($all_routes[$route_name])) {
-            $routeStack = $this->getData($route_name, $all_routes);
+            $routeStack[] = $this->getData($route_name, $all_routes[$route_name]);
         } else {
+            // Return all routes
             foreach ($all_routes as $route_name => $routeData) {
                 $routeStack[] = $this->getData($route_name, $routeData);
             }
         }
-        
+
         return $routeStack;
     }
 
     /**
      * Get container configuration
+     * 
+     * @throws \RuntimeException
      */
-    protected function getConfig(): ?array
+    protected function getConfig(): array
     {
         // Services
         if (!$container = ContainerResolver::resolve()) {
-            return null;
+            throw new \RuntimeException("Configuration file is not provided");
+        }
+        if (!$container->get('config')) {
+            throw new \RuntimeException("Configuration data is not provided");
         }
         return $container->get('config');
     }
 
     /**
+     * Return route data 
+     * 
      * @throws \RuntimeException
      */
     protected function getData(string $routeName, array $routeData): array
     {
-        $routeStack = new \SplStack;
         $routeStack = [];
-        $opt = $this->getFoundChild('options', $routeData);
-        $route = $this->getFoundChild('route', $opt);
-        
-        if (!$route) {
+
+        if (!$routeData) {
             throw new \RuntimeException(sprintf('Missing route configuration in %s', $routeName));
         }
+
+        $opt = $this->getFoundChild('options', $routeData);
+        $route = $this->getFoundChild('route', $opt);
+
+        // Default options
         $defaults = $this->getFoundChild('defaults', $opt);
-        
         $ctrl = $this->getFoundChild('controller', $defaults);
         $action = $this->getFoundChild('action', $defaults);
+
+        // Return values
         $routeStack = [
             'name' => $routeName,
             'route' => $route,
