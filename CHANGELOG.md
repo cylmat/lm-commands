@@ -1,6 +1,8 @@
-# Changelog
+Changelog
+=========
 
-All notable changes to this project will be documented in this file, in reverse chronological order by release.
-
-Version 0.1.0 / 2020-07-24
+v0.1 / 2020-08-06
 ---
+
+* Create LmConsole module
+* Add Debug routes command
