@@ -2,7 +2,7 @@
 
 return new class implements \Psr\Container\ContainerInterface
 {
-    protected $data = [
+    protected $data_test = [
         'config' => [
             'router' => [
                 'routes' => [
@@ -25,13 +25,13 @@ return new class implements \Psr\Container\ContainerInterface
 
     public function get($key)
     {
-        return $this->data[$key];
+        return $this->data_test[$key];
     }
 
     public function has($key)
     {
         if (array_key_exists($key, $this->data)) {
-            return $this->data[$key];
+            return $this->data_test[$key];
         }
     }
 };
