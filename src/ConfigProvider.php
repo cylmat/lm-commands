@@ -7,7 +7,7 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'laminas-cli' => $this->getCliConfig()
+            'laminas-cli' => $this->getCliConfig(),
         ];
     }
 
@@ -15,8 +15,8 @@ class ConfigProvider
     {
         return [
             'commands' => [
-                'debug:routes [module]' => Command\DebugRoutesCommand::class
-            ]
+                'debug:routes [module]' => Command\DebugRoutesCommand::class,
+            ],
         ];
     }
 }
