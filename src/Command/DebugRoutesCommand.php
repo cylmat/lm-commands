@@ -15,7 +15,7 @@ use function is_a;
 use function is_array;
 use function sprintf;
 
-class DebugRoutesCommand extends Command
+class DebugRoutesCommand extends AbstractCommand
 {
     /** @var string Name of command */
     protected static $defaultName = 'debug:routes';
