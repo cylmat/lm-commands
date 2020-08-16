@@ -7,8 +7,11 @@
  * @see https://docs.laminas.dev/tutorials/advanced-config/#environment-specific-application-configuration
  */
 return [
-    'modules' => 'LmConsole',
+    'modules' => ['Laminas\Router','LmConsole'],
     'module_listener_options' => [
-        'use_laminas_loader' => false  
+        'use_laminas_loader' => false,
+        'config_glob_paths' => [
+            realpath(__DIR__) . '/autoload/{{,*.}global,{,*.}local}.php'
+        ]
     ]
 ];
