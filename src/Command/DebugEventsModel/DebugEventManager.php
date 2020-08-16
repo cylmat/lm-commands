@@ -1,6 +1,6 @@
 <?php
 
-namespace LmConsole\Model\DebugEvents;
+namespace LmConsole\DebugEventsModel;
 
 use Laminas\EventManager\EventManager;
 
