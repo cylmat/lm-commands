@@ -41,12 +41,7 @@ class DebugEventManager extends EventManager
         }
     }
 
-    /*public function trigger($eventName, $target = null, $argv = [])
-    {
-        //echo 'trigger '.$eventName.'<br/>';
-        return parent::trigger($eventName, $target, $argv);
-    }*/
-
+    
     public function attach($eventName, $listener, $priority = 1)
     {
         echo 'attach '.$eventName.'';
@@ -56,10 +51,16 @@ class DebugEventManager extends EventManager
         echo ' : '.(is_object($listener)?get_class($listener):get_class($listener[0]).'[Array]').'<br/>';
         return parent::attach($eventName, $listener, $priority);
     }
+}
+
+/*public function trigger($eventName, $target = null, $argv = [])
+    {
+        //echo 'trigger '.$eventName.'<br/>';
+        return parent::trigger($eventName, $target, $argv);
+    }*/
 
     /*protected function triggerListeners( $event, $callback = null)
     {
         echo 'triggerListeners '.$event->getName().'<br/>';
         return parent::triggerListeners($event, $callback);
     }*/
-}

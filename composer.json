@@ -26,7 +26,8 @@
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "^2.0",
-        "laminas/laminas-eventmanager": "^3.2",
+        "laminas/laminas-mvc": "^3.1",
+        "laminas/laminas-test": "^3.4",
         "phpmd/phpmd": "^2.8",
         "phpspec/phpspec": "^6.2",
         "phpunit/phpunit": "^9.0",
