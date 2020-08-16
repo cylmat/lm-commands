@@ -12,8 +12,13 @@
 
     <!-- Paths to check -->
     <file>src</file>
-    <file>test</file>
+    <file>tests</file>
 
     <!-- Include all rules from Laminas Coding Standard -->
-    <rule ref="LaminasCodingStandard" />
+    <rule ref="LaminasCodingStandard">
+        <exclude name="SlevomatCodingStandard.Namespaces.DisallowGroupUse"/>
+        <exclude name="SlevomatCodingStandard.Namespaces.MultipleUsesPerLine"/>
+    </rule>
+    
 </ruleset>
+    <!-- Each import statement MUST be on its own line. -->
