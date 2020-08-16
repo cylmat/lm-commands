@@ -6,6 +6,6 @@ class Module
 {
     public function getConfig(): array
     {
-        return (new ConfigProvider)();
+        return (new ConfigProvider())();
     }
 }
