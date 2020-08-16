@@ -1,10 +1,10 @@
 <?php
 
-namespace LmConsole\Model\DebugEvents;
+namespace LmConsole\Command;
 
 use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
-$app = init($appConfig);
+/*$app = init($appConfig);
 $sm = $app->getServiceManager(); 
 
 $listenersFromAppConfig     = isset($appConfig['listeners']) ? $appConfig['listeners'] : [];
@@ -19,7 +19,7 @@ $app->run();
 //$app->getServiceManager()->debug();
 $app->getEventManager()->debug();
 
-(new dede)->run();
+(new dede)->run();*/
 
 //dm($abCtrl->getResponse());
 
@@ -49,7 +49,7 @@ class DebugAbstractHttpControllerTestCase extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
-    function initApplication($configuration = [])
+    public function initApplication($configuration = [])
     {
         // Prepare the service manager
         $smConfig = isset($configuration['service_manager']) ? $configuration['service_manager'] : [];
