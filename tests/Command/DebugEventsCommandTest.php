@@ -15,8 +15,11 @@ class DebugEventsCommandTest extends TestCase
     public function testExecute()
     {
         $config = require __DIR__ . '/../../config/application.config.php';
-        //$config['listeners']
-        \Laminas\Mvc\Application::init($config)->run();
+        
+        $application = \Laminas\Mvc\Application::init($config)->run();
+        $eventManager = $application->getEventManager();
+        $eventManager->debug();
+
         /*$command = new DebugRoutesCommand();
         $input   = new ArrayInput([
             'command'    => 'debug:routes',
