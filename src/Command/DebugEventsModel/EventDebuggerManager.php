@@ -1,10 +1,13 @@
 <?php
 
-namespace LmConsole\DebugEventsModel;
+namespace LmConsole\Command\DebugEventsModel;
 
 use Laminas\EventManager\EventManager;
 
-class DebugEventManager extends EventManager
+/**
+ * Event manager which can debug events list
+ */
+class EventDebuggerManager extends EventManager
 {
     static protected $static_events;
 
@@ -12,6 +15,7 @@ class DebugEventManager extends EventManager
     {
         //d($this->sharedManager);
         //d($this->identifiers);  //application
+        
 
         $events = self::$static_events;
         foreach($events as $e_name => $e_params) {
@@ -20,7 +24,7 @@ class DebugEventManager extends EventManager
             //d($e_params);
             krsort($e_params);
             foreach ($e_params as $e_priority => $e_listeners) {
-                echo " . . . Priority: ".$e_priority.'<br/>';
+                //echo " . . . Priority: ".$e_priority.'<br/>';
 
                 foreach ($e_listeners as $k) {
                     foreach ($k as $b) {
@@ -28,27 +32,26 @@ class DebugEventManager extends EventManager
                             d($b);
                         }*/
                         if(is_object($b)) {
-                            echo (is_string($b) ? $b. '<br/>' : ' . . . . . . '.get_class($b).' :: ');
+                            echo (is_string($b) ? $b. "\n" : ' . . . . . . '.get_class($b).' :: ');
                         }
                         foreach ($b as $aaa => $bbb) {
-                            echo (is_string($bbb) ? $bbb. '<br/>' : ' . . . . . . '.get_class($bbb).' :: ');
+                            echo (is_string($bbb) ? $bbb. "\n" : ' . . . . . . '.get_class($bbb).' :: ');
                             
                         }
                     }
                 }
             }
-            echo '<br/>';
         }
     }
 
     
     public function attach($eventName, $listener, $priority = 1)
     {
-        echo 'attach '.$eventName.'';
+        echo 'attach '.$eventName."\n";
 
         self::$static_events[$eventName][(int) $priority][0][] = $listener;
 
-        echo ' : '.(is_object($listener)?get_class($listener):get_class($listener[0]).'[Array]').'<br/>';
+        //echo ' : '.(is_object($listener)?get_class($listener):get_class($listener[0]).'[Array]').'<br/>';
         return parent::attach($eventName, $listener, $priority);
     }
 }
