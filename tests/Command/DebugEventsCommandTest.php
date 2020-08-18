@@ -18,7 +18,7 @@ class DebugEventsCommandTest extends TestCase
         
         $application = \Laminas\Mvc\Application::init($config)->run();
         $eventManager = $application->getEventManager();
-        $eventManager->debug();
+        $eventsList = $eventManager->getEventsList();
 
         /*$command = new DebugRoutesCommand();
         $input   = new ArrayInput([
