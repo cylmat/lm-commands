@@ -51,5 +51,4 @@ class DebugEventsCommand extends AbstractCommand
             ->setDescription('todo*** Debug events')
             ->setHelp('This command allows you to show a list of all events');
     }
-
 }
