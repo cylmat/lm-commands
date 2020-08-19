@@ -15,14 +15,18 @@ class DebugRoutesCommandTest extends TestCase
     public function testExecute()
     {
         $command = new DebugRoutesCommand();
+        $output  = new BufferedOutput();
+
+        $definition = new InputDefinition([
+            new InputArgument('command', InputArgument::REQUIRED),
+            new InputArgument('route_name', InputArgument::REQUIRED)
+        ]);
+
         $input   = new ArrayInput([
             'command'    => 'debug:routes',
             'route_name' => 'test1',
-        ], new InputDefinition([
-            new InputArgument('command', InputArgument::REQUIRED),
-            new InputArgument('route_name', InputArgument::REQUIRED),
-        ]));
-        $output  = new BufferedOutput();
+        ], $definition);
+        
         $command->execute($input, $output);
         echo "\n" . $output->fetch();
 
