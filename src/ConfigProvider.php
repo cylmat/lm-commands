@@ -7,7 +7,7 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'laminas-cli' => $this->getCliConfig(),
+            'laminas-cli' => $this->getCliConfig()
         ];
     }
 
