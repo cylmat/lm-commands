@@ -7,14 +7,20 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Interop\Container\ContainerInterface;
+use LmConsole\Command\DebugEventsModel\EventDebuggerManager;
+
 
 class DebugEventsCommand extends AbstractCommand
 {
     /**
-     * @var string $defaultName Name of command
+     * @var string
      */
     protected static $defaultName = 'debug:events';
 
+    /**
+     * @var string
+     */
     protected static $defaultArguments = '[route_name]';
 
     
@@ -27,19 +33,15 @@ class DebugEventsCommand extends AbstractCommand
     {
         $output->writeln(["<comment> - Events of application</comment>","========================"]);
 
-      //  $composer = include __DIR__.'/../../../vendor/autoload.php';
-        //var_dump(get_class_methods($composer));
-
-        //var_dump($composer->getPrefixesPsr4());
-        //var_dump(get_class_methods($this));
-        
+        $eventsList = $this->getEventsFromRoute('/');
+        var_dump($eventsList);
         return Command::SUCCESS;
     }
 
-                                                /* protected */
-
+    /* protected */
+    
     /**
-     * Configuration of arguments
+     * Configuration of input arguments
      */
     protected function configure()
     {
@@ -50,5 +52,42 @@ class DebugEventsCommand extends AbstractCommand
             // The short description shown while running "php bin/console list"
             ->setDescription('todo*** Debug events')
             ->setHelp('This command allows you to show a list of all events');
+    }
+
+    /**
+     * Get Application configuration
+     * included an EventManager which can debug all Events 
+     */
+    protected function getApplicationConfig(): array
+    {
+        $serviceConfig = [  
+            'service_manager' =>  [
+                'factories' => [
+                    'EventManager' => function (ContainerInterface $container, $name, array $options = null) {
+                        $shared = $container->has('SharedEventManager') ? $container->get('SharedEventManager') : null;
+                        return new EventDebuggerManager($shared);
+                    }
+                ],
+            ]
+        ];
+        return $serviceConfig;
+    }
+
+    /**
+     * Simulate an MVC application
+     * and get all Events on the dispatched route
+     */
+    protected function getEventsFromRoute(string $route): array
+    {
+        $config = require __DIR__ . '/../../config/application.config.php';
+        $serviceConfig = $this->getApplicationConfig();
+
+        $config = array_merge($config, $serviceConfig);
+        
+        $application = \Laminas\Mvc\Application::init($config)->run();
+        $eventManager = $application->getEventManager();
+        $eventsList = $eventManager->getEventsList();
+
+        return $eventsList;
     }
 }
