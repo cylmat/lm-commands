@@ -12,7 +12,12 @@ class EventDebuggerManager extends EventManager
     static protected $static_events;
 
     /**
-     * Return all events
+     * Return all events with pattern:
+     * 
+     * Event_name
+     *      Priority1 => Callable1
+     *      Priority2 => Callable2
+     *      Priority3 => Callable3
      */
     public function getEventsList(): array
     {
