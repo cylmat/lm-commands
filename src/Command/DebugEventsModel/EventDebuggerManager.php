@@ -19,12 +19,17 @@ class EventDebuggerManager extends EventManager
      *      Priority2 => Callable2
      *      Priority3 => Callable3
      */
-    public function getEventsList(): array
+    public function getEventsList(string $eventName = null): array
     {
         $events = [];
 
         // Get all events loaded into manager
         foreach(self::$static_events as $e_name => $e_params) {
+            // Skip others events if event_name is provided
+            if ($eventName && $e_name !== $eventName) { 
+                continue;
+            }
+
             $events[$e_name] = [];
             
             // Sort by priority asc
@@ -67,7 +72,6 @@ class EventDebuggerManager extends EventManager
                 }
             }
         }
-        
         return $events;
     }
     

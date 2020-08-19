@@ -15,19 +15,23 @@ class DebugEventsCommandTest extends TestCase
     public function testExecute()
     {
         $command = new DebugEventsCommand;
-
-        $input   = new ArrayInput([
-            'command'    => 'debug:events',
-            'route_name' => 'test1',
-        ], new InputDefinition([
-            new InputArgument('command', InputArgument::REQUIRED),
-            new InputArgument('route_name', InputArgument::REQUIRED),
-        ]));
         $output  = new BufferedOutput;
-        $command->execute($input, $output);
 
+        $definition = new InputDefinition([
+            new InputArgument('command', InputArgument::REQUIRED),
+            new InputArgument('route_name', InputArgument::OPTIONAL),
+            new InputArgument('event_name', InputArgument::OPTIONAL),
+        ]);
+
+        $input = new ArrayInput([
+            'command'    => 'debug:events',
+            'route_name' => '/',
+            'event_name' => ''
+        ], $definition);
+        
+        $command->execute($input, $output);
         echo "\n" . $output->fetch();
 
-        //$this->expectOutputRegex("/testing-url-1/");
+        //$this->expectOutputRegex("/Priority | Callable/");
     }
 }
