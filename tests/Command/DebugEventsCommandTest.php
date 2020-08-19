@@ -32,6 +32,6 @@ class DebugEventsCommandTest extends TestCase
         $command->execute($input, $output);
         echo "\n" . $output->fetch();
 
-        //$this->expectOutputRegex("/Priority | Callable/");
+        $this->expectOutputRegex("/Priority | Callable/");
     }
 }
