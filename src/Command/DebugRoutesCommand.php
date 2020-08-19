@@ -116,19 +116,24 @@ class DebugRoutesCommand extends AbstractCommand
      */
     protected function getData(string $routeName, array $routeData): array
     {
-        $routeStack = [];
-
-        if (! $routeData) {
+        if (!$routeData) {
             throw new RuntimeException(sprintf('Missing route configuration in %s', $routeName));
         }
 
         $opt   = $this->getFoundChild('options', $routeData);
+        if (!$opt) {
+            throw new RuntimeException(sprintf("Missing options configuration in %s", $routeName));
+        }
+
         $route = $this->getFoundChild('route', $opt);
 
         // Default options
         $defaults = $this->getFoundChild('defaults', $opt);
-        $ctrl     = $this->getFoundChild('controller', $defaults);
-        $action   = $this->getFoundChild('action', $defaults);
+        $ctrl = null;
+        if ($defaults) {
+            $ctrl     = $this->getFoundChild('controller', $defaults);
+            $action   = $this->getFoundChild('action', $defaults);
+        } 
 
         // Return values
         return [
