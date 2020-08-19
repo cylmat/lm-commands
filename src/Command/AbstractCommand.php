@@ -11,10 +11,19 @@ class AbstractCommand extends Command
 {
     protected $input, $output;
 
+    /**
+     * @var string
+     */
     protected static $defaultName = null;
 
+    /**
+     * @var string
+     */
     protected static $defaultArguments = null;
 
+    /**
+     * @inheritDoc
+     */
     public static function getDefaultName()
     {
         if (!static::$defaultName) {
@@ -32,12 +41,15 @@ class AbstractCommand extends Command
         return static::$defaultArguments;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
         $this->output = $output;
 
-        return Command::SUCCESS;
+        return Command::FAILURE; // Default value
     }
 
     protected function sendError(string $message)

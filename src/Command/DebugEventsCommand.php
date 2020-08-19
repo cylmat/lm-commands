@@ -31,15 +31,18 @@ class DebugEventsCommand extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
+        parent::execute($input, $output);
         $output->writeln(["<comment> - Events of application</comment>","========================"]);
 
         $eventsList = $this->getEventsFromRoute('/');
-        var_dump($eventsList);
+
+        $this->displayTemplate($eventsList);
+
         return Command::SUCCESS;
     }
 
     /* protected */
-    
+
     /**
      * Configuration of input arguments
      */
@@ -89,5 +92,74 @@ class DebugEventsCommand extends AbstractCommand
         $eventsList = $eventManager->getEventsList();
 
         return $eventsList;
+    }
+
+    protected function displayTemplate(array $eventsList): void
+    {
+        $output = '';
+        foreach ($eventsList as $eventName => $eventProperties) {
+            $output .= $this->getEventTemplate($eventName, $eventProperties);
+        }
+
+        // Final render
+        $this->output->writeln($output);
+    }
+
+    /**
+     * Get template for one event
+     */
+    protected function getEventTemplate(string $eventName, array $eventProperties): string
+    {
+        $leftSize = 10;
+        $centerSize = 100;
+        $pipe = '|';
+
+        // Display event name
+        $head  = '[' . strtoupper($eventName) . ']' . PHP_EOL;
+
+        // Display head bar
+        $head .= $this->getPatternLine($leftSize, $centerSize);
+        $head .= $this->getTextLine(" Priority ", $leftSize, " Callable ", $centerSize);
+        $head .= $this->getPatternLine($leftSize, $centerSize);
+
+        // Display events properties
+        $main = '';
+        foreach ($eventProperties as $priority => $callable) {
+            $main .= $this->getTextLine(" $priority ", $leftSize, " $callable ", $centerSize);
+        }
+        $main .= $this->getPatternLine($leftSize, $centerSize) . PHP_EOL;
+        return $head . $main;
+    }
+
+    /**
+     * Get rendered pattern line
+     */
+    protected function getPatternLine(int $leftSize, int $centerSize)
+    {
+        $cross = '+';
+        $dash = '-';
+
+        return $cross . $this->getPattern($dash, $leftSize) . 
+                $cross . $this->getPattern($dash, $centerSize) . 
+                $cross . PHP_EOL;
+    }
+
+    /**
+     * Get rendered text line
+     */
+    protected function getTextLine(string $leftText, int $leftSize, string $centerText, int $centerSize)
+    {
+        $pipe = '|';
+
+        return $pipe . str_pad($leftText, $leftSize, ' ') . $pipe . 
+                str_pad($centerText, $centerSize, ' ') . $pipe . PHP_EOL;
+    }
+
+    /**
+     * Get a repeated $pattern of $size
+     */
+    protected function getPattern(string $pattern, int $size)
+    {
+        return str_pad('', $size, $pattern);
     }
 }
