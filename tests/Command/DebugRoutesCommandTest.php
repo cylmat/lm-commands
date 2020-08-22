@@ -10,6 +10,7 @@ class DebugRoutesCommandTest extends TestCase
 {
     public function setUp(): void
     {
+        
     }
 
     public function testExecute()
