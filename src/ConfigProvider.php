@@ -39,9 +39,12 @@ class ConfigProvider
     }
 
     public function getCliConfig(): array
-    {
-        // Loaded commands files
-        /*$commands = \LmConsole\Model\ModuleCommandLoader::getCommands();
+    {        
+        $commands = null;
+        if (!isset($GLOBALS[Model\GlobalConfigRetriever::GLOBAL_REDUNDANCE_AVOIDER])) {
+            $commands = \LmConsole\Model\ModuleCommandLoader::getModulesCommands();
+        }
+
         if (!$commands) {
             return [];
         }
@@ -56,12 +59,6 @@ class ConfigProvider
 
         return [
             'commands' => $commandsList
-        ];*/
-
-        return [
-            'commands' => [
-                'debug:routes [module]' => Command\DebugRoutesCommand::class,
-            ]
         ];
     }
 }

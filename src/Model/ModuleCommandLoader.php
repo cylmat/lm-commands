@@ -10,7 +10,7 @@ class ModuleCommandLoader
      * 
      * @return array
      */
-    public static function getCommands(): array
+    public static function getModulesCommands(): array
     {
         $modulesPath = \LmConsole\Model\GlobalConfigRetriever::getModulesPath();
         $commandsList = [];

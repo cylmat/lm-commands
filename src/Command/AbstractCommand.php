@@ -36,7 +36,7 @@ class AbstractCommand extends Command
     public static function getDefaultArguments()
     {
         if (!static::$defaultArguments) {
-            throw new \DomainException("Please provide some default arguments for ".static::class." class");
+            throw new \DomainException("Please provide some default arguments for ".static::class." class. Did you omit the argument 's'?");
         }
         return static::$defaultArguments;
     }

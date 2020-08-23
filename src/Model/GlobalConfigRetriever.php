@@ -4,6 +4,8 @@ namespace LmConsole\Model;
 
 class GlobalConfigRetriever
 {
+    const GLOBAL_REDUNDANCE_AVOIDER = 'GLOBAL_REDUNDANCE_AVOIDER';
+
     /**
      * @throws \DomainException when modules.config.php not found
      * @todo Use laminas loader too
@@ -48,8 +50,9 @@ class GlobalConfigRetriever
     private static function getComposerAutoload(): \Composer\Autoload\ClassLoader
     {
         $included = \get_included_files();
+        
         foreach ($included as $fileName) {
-            if (preg_match('/^.*vendor\/autoload.php$/', $fileName, $match)) {
+            if (preg_match("/^.*vendor[\\/\\\]autoload.php$/", $fileName, $match)) {
                 $path = $match[0];
             }
         }
@@ -66,6 +69,10 @@ class GlobalConfigRetriever
      */
     private static function getGlobalConfig(): ?\Laminas\ServiceManager\ServiceManager
     {   
+        /**
+         * Avoid redundances with ContainerResolver::resolve()
+         */
+        $GLOBALS[self::GLOBAL_REDUNDANCE_AVOIDER] = true;
         $config = \Laminas\Cli\ContainerResolver::resolve();
         return is_object($config) ? $config : null;
     }

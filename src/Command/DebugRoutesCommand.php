@@ -20,7 +20,7 @@ class DebugRoutesCommand extends AbstractCommand
     /** @var string Name of command */
     protected static $defaultName = 'debug:routes';
 
-    protected static $defaultArgument = '[route_name]';
+    protected static $defaultArguments = '[route_name]';
 
     /**
      * Execute action
