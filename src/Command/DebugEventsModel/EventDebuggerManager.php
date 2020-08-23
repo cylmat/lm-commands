@@ -1,32 +1,39 @@
 <?php
 
+/**
+ * Laminas EventManager used to retrieve events list
+ *
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD 3-Clause License
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace LmConsole\Command\DebugEventsModel;
 
 use Laminas\EventManager\EventManager;
 
-/**
- * Event manager which can debug events list
- */
 class EventDebuggerManager extends EventManager
 {
-    static protected $static_events;
+    /** @var array */
+    protected static $static_events;
 
     /**
      * Return all events with pattern:
-     * 
+     *
      * Event_name
      *      Priority1 => Callable1
      *      Priority2 => Callable2
      *      Priority3 => Callable3
      */
-    public function getEventsList(string $eventName = null): array
+    public function getEventsList(?string $eventName = null): array
     {
         $events = [];
 
         // Get all events loaded into manager
-        foreach(self::$static_events as $e_name => $e_params) {
+        foreach (self::$static_events as $e_name => $e_params) {
             // Skip others events if event_name is provided
-            if ($eventName && $e_name !== $eventName) { 
+            if ($eventName && $e_name !== $eventName) {
                 continue;
             }
 
@@ -38,32 +45,27 @@ class EventDebuggerManager extends EventManager
 
             // Load each listeners
             foreach ($e_params as $e_priority => $e_listeners) {
-
                 // Load listener
                 $currentPriority = $e_priority;
                 foreach ($e_listeners as $e_listener) {
                     foreach ($e_listener as $class) {
-
                         $events[$e_name][$currentPriority] = $events[$e_name][$currentPriority] ?? "";
 
                         // Object __invoke()
-                        if(is_object($class)) {
-                            $invokedClass = get_class($class) . '()';
+                        if (is_object($class)) {
+                            $invokedClass                  = get_class($class) . '()';
                             $events[$e_name][$e_priority] .= $invokedClass;
-
-                        } elseif(is_array($class)){
-
+                        } elseif (is_array($class)) {
                             // Array, events stacked
                             // Increment priority for each stacked event of same priority
                             foreach ($class as $n => $label) {
-
                                 // n:0 for class
                                 // n:1 for method
-                                $classOrMethod = (is_string($label) ? $label . '()' : get_class($label) . '::');
+                                $classOrMethod = is_string($label) ? $label . '()' : get_class($label) . '::';
                                 $events[$e_name][$currentPriority] .= $classOrMethod;
                             }
                             $currentPriority++;
-                        } 
+                        }
 
                         // Sort each event by priority desc
                         // higher launched first
@@ -76,35 +78,30 @@ class EventDebuggerManager extends EventManager
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     * phpcs:disable WebimpressCodingStandard.Functions
      */
     public function attach($eventName, $listener, $priority = 1)
     {
-        //echo 'attach '.$eventName."\n";
-
         self::$static_events[$eventName][(int) $priority][0][] = $listener;
-
-        //echo ' : '.(is_object($listener)?get_class($listener):get_class($listener[0]).'[Array]').'<br/>';
         return parent::attach($eventName, $listener, $priority);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     * phpcs:disable WebimpressCodingStandard.Functions
      */
     public function trigger($eventName, $target = null, $argv = [])
     {
-        //echo 'trigger '.$eventName . "\n";
-        //echo $this->getIdentifiers();
         return parent::trigger($eventName, $target, $argv);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     * phpcs:disable WebimpressCodingStandard.Functions
      */
-    public function triggerListeners( $event, $callback = null)
+    public function triggerListeners($event, $callback = null)
     {
-        //echo 'triggerListeners '.$event->getName() . "\n";
         return parent::triggerListeners($event, $callback);
     }
 }
-

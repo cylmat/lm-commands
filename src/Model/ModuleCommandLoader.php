@@ -2,34 +2,41 @@
 
 namespace LmConsole\Model;
 
+use Laminas\Code\Reflection\FileReflection;
+use LmConsole\Command\AbstractCommand;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
 class ModuleCommandLoader
 {
     /**
      * Get commands from all loaded modules
      * Look into each files for a LmConsole\Command\AbstractCommand extended class
-     * 
-     * @return array
      */
     public static function getModulesCommands(): array
     {
-        $modulesPath = \LmConsole\Model\GlobalConfigRetriever::getModulesPath();
+        $modulesPath  = GlobalConfigRetriever::getModulesPath();
         $commandsList = [];
 
         // Look into each module directory
         foreach ($modulesPath as $path) {
-            $directoryIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
+            $directoryIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
             
             // Look for each php file
             foreach ($directoryIterator as $file) {
-                if ($file->isDir()) continue;
+                if ($file->isDir()) {
+                    continue;
+                }
 
-                if (!preg_match('/^.+Command.php$/', $file->getFilename())) continue;
+                if (! preg_match('/^.+Command.php$/', $file->getFilename())) {
+                    continue;
+                }
 
-                $fileReflection = new \Laminas\Code\Reflection\FileReflection($file->getRealpath(), true);
+                $fileReflection = new FileReflection($file->getRealpath(), true);
 
                 // One class for one file
                 $class = $fileReflection->getClasses()[0];
-                if ('LmConsole\Command\AbstractCommand' == $class->getParentClass()->getName()) {
+                if (AbstractCommand::class === $class->getParentClass()->getName()) {
                     $commandsList[] = $class->getName();
                 }
             }

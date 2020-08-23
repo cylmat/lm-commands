@@ -3,17 +3,10 @@
 namespace LmConsole\Command;
 
 use Laminas\Cli\ContainerResolver;
-use RecursiveArrayIterator;
-use RecursiveIteratorIterator;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use function is_a;
-use function is_array;
-use function sprintf;
 
 class DebugRoutesCommand extends AbstractCommand
 {
@@ -116,12 +109,12 @@ class DebugRoutesCommand extends AbstractCommand
      */
     protected function getData(string $routeName, array $routeData): array
     {
-        if (!$routeData) {
+        if (! $routeData) {
             throw new RuntimeException(sprintf('Missing route configuration in %s', $routeName));
         }
 
-        $opt   = $this->getFoundChild('options', $routeData);
-        if (!$opt) {
+        $opt = $this->getFoundChild('options', $routeData);
+        if (! $opt) {
             throw new RuntimeException(sprintf("Missing options configuration in %s", $routeName));
         }
 
@@ -129,11 +122,11 @@ class DebugRoutesCommand extends AbstractCommand
 
         // Default options
         $defaults = $this->getFoundChild('defaults', $opt);
-        $ctrl = null;
+        $ctrl     = null;
         if ($defaults) {
-            $ctrl     = $this->getFoundChild('controller', $defaults);
-            $action   = $this->getFoundChild('action', $defaults);
-        } 
+            $ctrl   = $this->getFoundChild('controller', $defaults);
+            $action = $this->getFoundChild('action', $defaults);
+        }
 
         // Return values
         return [

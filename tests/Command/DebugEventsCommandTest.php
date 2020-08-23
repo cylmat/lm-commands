@@ -14,8 +14,8 @@ class DebugEventsCommandTest extends TestCase
 
     public function testExecute()
     {
-        $command = new DebugEventsCommand;
-        $output  = new BufferedOutput;
+        $command = new DebugEventsCommand();
+        $output  = new BufferedOutput();
 
         $definition = new InputDefinition([
             new InputArgument('command', InputArgument::REQUIRED),
@@ -26,7 +26,7 @@ class DebugEventsCommandTest extends TestCase
         $input = new ArrayInput([
             'command'    => 'debug:events',
             'route_name' => '/',
-            'event_name' => ''
+            'event_name' => '',
         ], $definition);
         
         $command->execute($input, $output);

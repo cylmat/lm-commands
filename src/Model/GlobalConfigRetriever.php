@@ -2,38 +2,44 @@
 
 namespace LmConsole\Model;
 
+use Composer\Autoload\ClassLoader;
+use DomainException;
+use Laminas\Cli\ContainerResolver;
+use Laminas\ServiceManager\ServiceManager;
+use ReflectionClass;
+
 class GlobalConfigRetriever
 {
-    const GLOBAL_REDUNDANCE_AVOIDER = 'GLOBAL_REDUNDANCE_AVOIDER';
+    public const GLOBAL_REDUNDANCE_AVOIDER = 'GLOBAL_REDUNDANCE_AVOIDER';
 
     /**
-     * @throws \DomainException when modules.config.php not found
+     * @throws DomainException When modules.config.php not found.
      * @todo Use laminas loader too
      */
     public static function getModulesPath(): array
     {
         $globalConfig = self::getGlobalConfig();
 
-        if(gettype($globalConfig)!=='object') {
+        if (gettype($globalConfig) !== 'object') {
             return [];
         }
 
         // Get Application modules list
-        $ref = new \ReflectionClass(\Laminas\ServiceManager\ServiceManager::class);
-        $d = $ref->getProperty('services');
+        $ref = new ReflectionClass(ServiceManager::class);
+        $d   = $ref->getProperty('services');
         $d->setAccessible(true);
 
         $value = $d->getValue($globalConfig);
-        if (!isset($value['ApplicationConfig']['modules'])) {
-            throw new \DomainException("Can't find loaded modules, did you provide a modules.config.php file?");
+        if (! isset($value['ApplicationConfig']['modules'])) {
+            throw new DomainException("Can't find loaded modules, did you provide a modules.config.php file?");
         }
-        $modules  = $value['ApplicationConfig']['modules'];
+        $modules = $value['ApplicationConfig']['modules'];
 
         // Get modules path
         $autoload = self::getComposerAutoload();
 
         $prefixes = $autoload->getPrefixesPsr4();
-        $paths = [];
+        $paths    = [];
         foreach ($modules as $moduleName) {
             $paths[$moduleName] = $prefixes[$moduleName . '\\'][0];
         }
@@ -44,12 +50,11 @@ class GlobalConfigRetriever
     /* private */
 
     /**
-     * @return \Composer\Autoload\ClassLoader
-     * @throws \DomainException when vendor/autoload.php not found
+     * @throws DomainException When vendor/autoload.php not found.
      */
-    private static function getComposerAutoload(): \Composer\Autoload\ClassLoader
+    private static function getComposerAutoload(): ClassLoader
     {
-        $included = \get_included_files();
+        $included = get_included_files();
         
         foreach ($included as $fileName) {
             if (preg_match("/^.*vendor[\\/\\\]autoload.php$/", $fileName, $match)) {
@@ -57,23 +62,20 @@ class GlobalConfigRetriever
             }
         }
         
-        if (!isset($path)) {
-            throw new \DomainException("vendor/autoload.php not found.");
+        if (! isset($path)) {
+            throw new DomainException("vendor/autoload.php not found.");
         }
 
         return include $path;
     }
     
-    /**
-     * @return null|\Laminas\ServiceManager\ServiceManager
-     */
-    private static function getGlobalConfig(): ?\Laminas\ServiceManager\ServiceManager
-    {   
+    private static function getGlobalConfig(): ?ServiceManager
+    {
         /**
          * Avoid redundances with ContainerResolver::resolve()
          */
         $GLOBALS[self::GLOBAL_REDUNDANCE_AVOIDER] = true;
-        $config = \Laminas\Cli\ContainerResolver::resolve();
+        $config = ContainerResolver::resolve();
         return is_object($config) ? $config : null;
     }
 }

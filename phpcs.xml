@@ -18,6 +18,12 @@
     <rule ref="LaminasCodingStandard">
         <exclude name="SlevomatCodingStandard.Namespaces.DisallowGroupUse"/>
         <exclude name="SlevomatCodingStandard.Namespaces.MultipleUsesPerLine"/>
+        <exclude name="WebimpressCodingStandard.PHP.ImportInternalFunction"/>
+        <exclude name="WebimpressCodingStandard.NamingConventions.ValidVariableName"/>
+        <exclude name="Generic.Formatting.MultipleStatementAlignment"/>
+        <exclude name="WebimpressCodingStandard.Functions.Param"/>
+        
+        
     </rule>
     
 </ruleset>

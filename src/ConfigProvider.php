@@ -2,6 +2,8 @@
 
 namespace LmConsole;
 
+use Laminas\Router\Http\Literal;
+
 class ConfigProvider
 {
     public function __invoke(): array
@@ -11,41 +13,40 @@ class ConfigProvider
 
             // For unit testing framework
             'view_manager' => [
-                'exception_template'       => 'error/index',
-                'template_map' => [
-                    'layout/layout'           => __DIR__ . '/error.phtml',
-                    'error/404'               => __DIR__ . '/error.phtml', 
-                    'error/index'             => __DIR__ . '/error.phtml',
-                ]
+                'exception_template' => 'error/index',
+                'template_map'       => [
+                    'layout/layout' => __DIR__ . '/error.phtml',
+                    'error/404'     => __DIR__ . '/error.phtml',
+                    'error/index'   => __DIR__ . '/error.phtml',
+                ],
             ],
-
-            'router' => [
+            'router'       => [
                 'routes' => [
                     'test1' => [
-                        'type' => \Laminas\Router\Http\Literal::class,
+                        'type'    => Literal::class,
                         'options' => [
-                            'route' => '/testing-url-1'
-                        ]
+                            'route' => '/testing-url-1',
+                        ],
                     ],
                     'test2' => [
-                        'type' => \Laminas\Router\Http\Literal::class,
+                        'type'    => Literal::class,
                         'options' => [
-                            'route' => '/testing-url-2'
-                        ]
-                    ]
+                            'route' => '/testing-url-2',
+                        ],
+                    ],
                 ],
             ],
         ];
     }
 
     public function getCliConfig(): array
-    {        
+    {
         $commands = null;
-        if (!isset($GLOBALS[Model\GlobalConfigRetriever::GLOBAL_REDUNDANCE_AVOIDER])) {
-            $commands = \LmConsole\Model\ModuleCommandLoader::getModulesCommands();
+        if (! isset($GLOBALS[Model\GlobalConfigRetriever::GLOBAL_REDUNDANCE_AVOIDER])) {
+            $commands = Model\ModuleCommandLoader::getModulesCommands();
         }
 
-        if (!$commands) {
+        if (! $commands) {
             return [];
         }
 
@@ -53,12 +54,12 @@ class ConfigProvider
         // Retrieve COMMAND [arguments] list
         $commandsList = [];
         foreach ($commands as $command) {
-            $key = ($command)::getDefaultName() . ' ' . ($command)::getDefaultArguments();
-            $commandsList[ $key ] = ($command);
+            $key                  = $command::getDefaultName() . ' ' . $command::getDefaultArguments();
+            $commandsList[ $key ] = $command;
         }
 
         return [
-            'commands' => $commandsList
+            'commands' => $commandsList,
         ];
     }
 }

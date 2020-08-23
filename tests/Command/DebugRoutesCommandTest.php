@@ -10,7 +10,6 @@ class DebugRoutesCommandTest extends TestCase
 {
     public function setUp(): void
     {
-        
     }
 
     public function testExecute()
@@ -20,10 +19,10 @@ class DebugRoutesCommandTest extends TestCase
 
         $definition = new InputDefinition([
             new InputArgument('command', InputArgument::REQUIRED),
-            new InputArgument('route_name', InputArgument::REQUIRED)
+            new InputArgument('route_name', InputArgument::REQUIRED),
         ]);
 
-        $input   = new ArrayInput([
+        $input = new ArrayInput([
             'command'    => 'debug:routes',
             'route_name' => 'test1',
         ], $definition);
