@@ -12,7 +12,6 @@
 namespace LmConsole\Command\DebugEventsModel;
 
 use Laminas\EventManager\EventManager;
-
 class EventDebuggerManager extends EventManager
 {
     /** @var array */

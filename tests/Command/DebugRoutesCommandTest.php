@@ -15,27 +15,39 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class DebugRoutesCommandTest extends TestCase
 {
+    protected $command;
+    protected $output;
+    protected $definition;
+
     public function setUp(): void
     {
+        $this->command = new DebugRoutesCommand;
+        $this->output  = new BufferedOutput;
+
+        $this->definition = new InputDefinition([
+            new InputArgument('command', InputArgument::REQUIRED),
+            new InputArgument('route_name', InputArgument::REQUIRED),
+        ]);
     }
 
     public function testExecute()
     {
-        $command = new DebugRoutesCommand();
-        $output  = new BufferedOutput();
+        $this->expectException(\Symfony\Component\Console\Exception\RuntimeException::class);
 
-        $definition = new InputDefinition([
-            new InputArgument('command', InputArgument::REQUIRED),
-            new InputArgument('route_name', InputArgument::REQUIRED),
-        ]);
+        $input = new ArrayInput([
+            'command'    => 'debug:routes'
+        ], $this->definition);
+    }
 
+    public function testWithRoute()
+    {
         $input = new ArrayInput([
             'command'    => 'debug:routes',
             'route_name' => 'test1',
-        ], $definition);
+        ], $this->definition);
         
-        $command->execute($input, $output);
-        echo "\n" . $output->fetch();
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
 
         $this->expectOutputRegex("/testing-url-1/");
     }

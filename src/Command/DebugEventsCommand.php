@@ -28,6 +28,8 @@ class DebugEventsCommand extends AbstractCommand
 
     /** @var string */
     protected static $defaultArguments = '[route_name] [event_name]';
+
+    protected static $default_route = '/';
     
     /**
      * Execute action
@@ -39,7 +41,7 @@ class DebugEventsCommand extends AbstractCommand
         parent::execute($input, $output);
         $output->writeln(["<comment> - Events of application</comment>", "========================"]);
 
-        $inputRoute = $input->getArgument('route_name');
+        $inputRoute = $input->getArgument('route_name') ?? self::$default_route;
         $inputEvent = $input->getArgument('event_name');
         $eventsList = $this->getEventsFromRoute($inputRoute, $inputEvent);
         $this->displayTemplate($eventsList);
@@ -88,7 +90,7 @@ class DebugEventsCommand extends AbstractCommand
      * Simulate an MVC application
      * and get all Events on the dispatched route
      */
-    protected function getEventsFromRoute(string $inputRoute, string $inputEventName): array
+    protected function getEventsFromRoute(string $inputRoute, ?string $inputEventName): array
     {
         $config        = require __DIR__ . '/../../config/application.config.php';
         $serviceConfig = $this->getApplicationConfig();
@@ -96,7 +98,7 @@ class DebugEventsCommand extends AbstractCommand
         $config = array_merge($config, $serviceConfig);
         
         $application  = Application::init($config)->run();
-        $eventManager = $application->getEventManager();
+        $eventManager = $application->getEventManager(); //EventDebuggerManager
         $eventsList   = $eventManager->getEventsList($inputEventName);
 
         // Check input if no results
