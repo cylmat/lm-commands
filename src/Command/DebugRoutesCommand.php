@@ -40,7 +40,7 @@ class DebugRoutesCommand extends AbstractCommand
         if ($input->hasArgument('route_name') && isset($routes[$input->getArgument('route_name')])) {
             $routes = $routes[$input->getArgument('route_name')];
         }
-        $output->writeln(["<comment>\t - Routes of application</comment>", "============"]);
+        $output->writeln(["<comment>Routes of application</comment>", "============"]);
         
         foreach ($definedRoutes as $i => $route) {
             $output->writeln([

@@ -180,36 +180,4 @@ class DebugEventsCommand extends AbstractCommand
         $main .= $this->getPatternLine($leftSize, $centerSize) . PHP_EOL;
         return $head . $main;
     }
-
-    /**
-     * Get rendered pattern line
-     */
-    protected function getPatternLine(int $leftSize, int $centerSize): string
-    {
-        $cross = '+';
-        $dash  = '-';
-
-        return $cross . $this->getPattern($dash, $leftSize)
-                . $cross . $this->getPattern($dash, $centerSize)
-                . $cross . PHP_EOL;
-    }
-
-    /**
-     * Get rendered text line
-     */
-    protected function getTextLine(string $leftText, int $leftSize, string $centerText, int $centerSize): string
-    {
-        $pipe = '|';
-
-        return $pipe . str_pad($leftText, $leftSize, ' ') . $pipe
-                . str_pad($centerText, $centerSize, ' ') . $pipe . PHP_EOL;
-    }
-
-    /**
-     * Get a repeated $pattern of $size
-     */
-    protected function getPattern(string $pattern, int $size): string
-    {
-        return str_pad('', $size, $pattern);
-    }
 }
