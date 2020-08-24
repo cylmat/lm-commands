@@ -26,17 +26,20 @@ class DebugRoutesCommandTest extends TestCase
 
         $this->definition = new InputDefinition([
             new InputArgument('command', InputArgument::REQUIRED),
-            new InputArgument('route_name', InputArgument::REQUIRED),
+            new InputArgument('route_name', InputArgument::OPTIONAL),
         ]);
     }
 
     public function testExecute()
     {
-        $this->expectException(\Symfony\Component\Console\Exception\RuntimeException::class);
-
         $input = new ArrayInput([
             'command'    => 'debug:routes'
         ], $this->definition);
+
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
+
+        $this->expectOutputRegex("/testing-url-2/");
     }
 
     public function testWithRoute()
