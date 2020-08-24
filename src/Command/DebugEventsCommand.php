@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Debug events used in Laminas MVC Module
+ *
+ * @license https://opensource.org/licenses/MIT License
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace LmConsole\Command;
 
 use Interop\Container\ContainerInterface;
@@ -120,7 +129,7 @@ class DebugEventsCommand extends AbstractCommand
     }
 
     /**
-     * Display all avents
+     * Display all events
      */
     protected function displayTemplate(array $eventsList): void
     {

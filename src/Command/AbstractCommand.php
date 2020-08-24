@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Abstract command used in LmConsole
+ *
+ * @license https://opensource.org/licenses/MIT License
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace LmConsole\Command;
 
 use DomainException;
@@ -9,8 +18,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractCommand extends Command
 {
+    /** @var InputInterface */
     protected $input;
     
+    /** @var OutputInterface */
     protected $output;
 
     /** @var string */
@@ -30,6 +41,9 @@ class AbstractCommand extends Command
         return parent::getDefaultName();
     }
 
+    /**
+     * Get a string displaying the defaults arguments used in this command
+     */
     public static function getDefaultArguments(): string
     {
         if (! static::$defaultArguments) {
@@ -50,7 +64,10 @@ class AbstractCommand extends Command
         return Command::FAILURE; // Default value
     }
 
-    protected function sendError(string $message)
+    /**
+     * Display an error message to output
+     */
+    protected function sendError(string $message): void
     {
         $message = "ERROR: $message";
         $this->output->writeln($message);

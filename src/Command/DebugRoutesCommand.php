@@ -1,8 +1,20 @@
 <?php
 
+/**
+ * Debug routes of Laminas MVC Module
+ *
+ * @license https://opensource.org/licenses/MIT License
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace LmConsole\Command;
 
 use Laminas\Cli\ContainerResolver;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,6 +25,7 @@ class DebugRoutesCommand extends AbstractCommand
     /** @var string Name of command */
     protected static $defaultName = 'debug:routes';
 
+    /** @var string List of arguments */
     protected static $defaultArguments = '[route_name]';
 
     /**
@@ -39,7 +52,7 @@ class DebugRoutesCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-                                                /* protected */
+    /* protected */
 
     /**
      * Configuration of arguments
@@ -136,6 +149,9 @@ class DebugRoutesCommand extends AbstractCommand
         ];
     }
 
+    /**
+     * Change array to iterator
+     */
     protected function toArrayIterator(array $array): RecursiveIteratorIterator
     {
         $iter = new RecursiveArrayIterator($array);

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Get global configuration file to retrieve list of all modules
+ * 
+ * @license https://opensource.org/licenses/MIT License
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace LmConsole\Model;
 
 use Composer\Autoload\ClassLoader;
@@ -50,6 +59,8 @@ class GlobalConfigRetriever
     /* private */
 
     /**
+     * Get the ClassLoader object
+     * 
      * @throws DomainException When vendor/autoload.php not found.
      */
     private static function getComposerAutoload(): ClassLoader
@@ -69,6 +80,9 @@ class GlobalConfigRetriever
         return include $path;
     }
     
+    /**
+     * Retrieve the config resolver
+     */
     private static function getGlobalConfig(): ?ServiceManager
     {
         /**
