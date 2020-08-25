@@ -22,7 +22,8 @@
     },
     "require": {
         "php": "^7.3",
-        "laminas/laminas-cli": "^0.1.1"
+        "laminas/laminas-cli": "^0.1.1",
+        "laminas/laminas-code": "^3.4"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "^2.0",

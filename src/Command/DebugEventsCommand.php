@@ -1,42 +1,49 @@
 <?php
 
+/**
+ * Debug events used in Laminas MVC Module
+ *
+ * @license https://opensource.org/licenses/MIT License
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace LmConsole\Command;
 
+use Interop\Container\ContainerInterface;
+use Laminas\Mvc\Application;
+use LmConsole\Command\DebugEventsModel\EventDebuggerManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-
-use Interop\Container\ContainerInterface;
-use LmConsole\Command\DebugEventsModel\EventDebuggerManager;
-
 
 class DebugEventsCommand extends AbstractCommand
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected static $defaultName = 'debug:events';
 
-    /**
-     * @var string
-     */
-    protected static $defaultArguments = '[route_name] [event_name]';
-
+    /** @var array */
+    protected static $defaultArguments = [
+        'route' => '/'
+    ];
     
     /**
      * Execute action
-     * 
+     *
      * @return int Error code|Command::FAILURE|Command::SUCCESS if ok
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         parent::execute($input, $output);
-        $output->writeln(["<comment> - Events of application</comment>","========================"]);
+        
+        // Display head
+        $this->displayHead("Events of application");
 
-        $inputRoute = $input->getArgument('route_name');
+        $inputRoute = $input->getArgument('route_name') ?? self::$defaultArguments['route'];
         $inputEvent = $input->getArgument('event_name');
+
         $eventsList = $this->getEventsFromRoute($inputRoute, $inputEvent);
         $this->displayTemplate($eventsList);
 
@@ -48,7 +55,7 @@ class DebugEventsCommand extends AbstractCommand
     /**
      * Configuration of input arguments
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('route_name', InputArgument::OPTIONAL, "The module route name, will be '/' otherwise.")
@@ -64,41 +71,38 @@ class DebugEventsCommand extends AbstractCommand
 
     /**
      * Get Application configuration
-     * included an EventManager which can debug all Events 
+     * included an EventManager which can debug all Events
      */
     protected function getApplicationConfig(): array
     {
-        $serviceConfig = [  
-            'service_manager' =>  [
+        return [
+            'service_manager' => [
                 'factories' => [
-                    'EventManager' => function (ContainerInterface $container, $name, array $options = null) {
+                    'EventManager' => function (ContainerInterface $container, $name, ?array $options = null) {
                         $shared = $container->has('SharedEventManager') ? $container->get('SharedEventManager') : null;
                         return new EventDebuggerManager($shared);
-                    }
+                    },
                 ],
-            ]
+            ],
         ];
-        return $serviceConfig;
     }
 
     /**
      * Simulate an MVC application
      * and get all Events on the dispatched route
      */
-    protected function getEventsFromRoute(string $inputRoute, string $inputEventName): array
+    protected function getEventsFromRoute(string $inputRoute, ?string $inputEventName): array
     {
-        $config = require __DIR__ . '/../../config/application.config.php';
+        $config        = require __DIR__ . '/../../config/application.config.php';
         $serviceConfig = $this->getApplicationConfig();
 
         $config = array_merge($config, $serviceConfig);
         
-        $application = \Laminas\Mvc\Application::init($config)->run();
-        $eventManager = $application->getEventManager();
-        $eventsList = $eventManager->getEventsList($inputEventName);
+        $application  = Application::init($config)->run();
+        $eventManager = $application->getEventManager(); //EventDebuggerManager
+        $eventsList   = $eventManager->getEventsList($inputEventName);
 
-        /**
-         * Check input if no results
-         */
+        // Check input if no results
         if ($inputEventName && 0 === count($eventsList)) {
             $this->checkInputEventSpell($inputEventName, $eventManager);
         }
@@ -109,7 +113,7 @@ class DebugEventsCommand extends AbstractCommand
     /**
      * Check levenstein event spell if no events are returned
      */
-    protected function checkInputEventSpell(string $inputEventName, EventDebuggerManager $eventManager)
+    protected function checkInputEventSpell(string $inputEventName, EventDebuggerManager $eventManager): void
     {
         $eventsList = $eventManager->getEventsList();
 
@@ -120,7 +124,7 @@ class DebugEventsCommand extends AbstractCommand
             }
         }
 
-        $msg = "We couldn't find event '$inputEventName'. Did you mean one of these?" . PHP_EOL; 
+        $msg = "We couldn't find event '$inputEventName'. Did you mean one of these?" . PHP_EOL;
         foreach ($result as $existsName) {
             $msg .= ' - ' . $existsName . PHP_EOL;
         }
@@ -128,7 +132,7 @@ class DebugEventsCommand extends AbstractCommand
     }
 
     /**
-     * Display all avents
+     * Display all events
      */
     protected function displayTemplate(array $eventsList): void
     {
@@ -150,19 +154,22 @@ class DebugEventsCommand extends AbstractCommand
          * info colors:  black, red, green, yellow, blue, magenta, cyan and white.
          * info options: bold, underscore, blink, reverse
          */
-        $leftSize = 10;
+        $leftSize   = 10;
         $centerSize = 40; //Default value
-        $pipe = '|';
+        $pipe       = '|';
 
-        // Get max propertie text size 
+        // Get max propertie text size
         foreach ($eventProperties as $priority => $callable) {
             if (strlen($callable) > $centerSize) {
-                $centerSize = strlen($callable) + 2; // count with '()' size
+                $centerSize = strlen($callable); 
             }
         }
 
+        // Align with head
+        $centerSize += 2; // count with '()' size
+
         // Display event name
-        $head  = ' [' . $eventName . ']' . PHP_EOL;
+        $head = ' [' . $eventName . ']' . PHP_EOL;
 
         // Display head bar
         $head .= $this->getPatternLine($leftSize, $centerSize);
@@ -176,37 +183,5 @@ class DebugEventsCommand extends AbstractCommand
         }
         $main .= $this->getPatternLine($leftSize, $centerSize) . PHP_EOL;
         return $head . $main;
-    }
-
-    /**
-     * Get rendered pattern line
-     */
-    protected function getPatternLine(int $leftSize, int $centerSize)
-    {
-        $cross = '+';
-        $dash = '-';
-
-        return $cross . $this->getPattern($dash, $leftSize) . 
-                $cross . $this->getPattern($dash, $centerSize) . 
-                $cross . PHP_EOL;
-    }
-
-    /**
-     * Get rendered text line
-     */
-    protected function getTextLine(string $leftText, int $leftSize, string $centerText, int $centerSize)
-    {
-        $pipe = '|';
-
-        return $pipe . str_pad($leftText, $leftSize, ' ') . $pipe . 
-                str_pad($centerText, $centerSize, ' ') . $pipe . PHP_EOL;
-    }
-
-    /**
-     * Get a repeated $pattern of $size
-     */
-    protected function getPattern(string $pattern, int $size)
-    {
-        return str_pad('', $size, $pattern);
     }
 }

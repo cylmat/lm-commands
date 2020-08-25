@@ -1,26 +1,27 @@
 <?php
 
+/**
+ * Debug routes of Laminas MVC Module
+ *
+ * @license https://opensource.org/licenses/MIT License
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace LmConsole\Command;
 
 use Laminas\Cli\ContainerResolver;
-use RecursiveArrayIterator;
-use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function is_a;
-use function is_array;
-use function sprintf;
-
 class DebugRoutesCommand extends AbstractCommand
 {
     /** @var string Name of command */
     protected static $defaultName = 'debug:routes';
-
-    protected static $defaultArgument = '[route_name]';
 
     /**
      * Execute action
@@ -29,24 +30,26 @@ class DebugRoutesCommand extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
+        parent::execute($input, $output);
+
+        // All routes
         $routes = $definedRoutes = $this->getRoutes($input);
 
+        // One single route in Input
         if ($input->hasArgument('route_name') && isset($routes[$input->getArgument('route_name')])) {
             $routes = $routes[$input->getArgument('route_name')];
         }
-        $output->writeln(["<comment>\t - Routes of application</comment>", "============"]);
+
+        // Display head
+        $this->displayHead("Routes of application");
         
-        foreach ($definedRoutes as $i => $route) {
-            $output->writeln([
-                "<comment>{$route['name']}</comment>",
-                "\t<info>Route: {$route['route']}</info>",
-                $route['default_controller'] ? "\tdefault: " . $route['default_controller'] : "\t-no default params",
-            ]);
-        }
+        // Display routes
+        $this->displayRoutes($routes);
+
         return Command::SUCCESS;
     }
 
-                                                /* protected */
+    /* protected */
 
     /**
      * Configuration of arguments
@@ -62,7 +65,71 @@ class DebugRoutesCommand extends AbstractCommand
     }
 
     /**
-     * Get container configuration
+     * Display routes
+     */
+    protected function displayRoutes(array $definedRoutes): void
+    {
+        // Get size of columns
+        $leftSize = 40; //default value
+        $centerSize = 50;
+        $rightSize = 50;
+
+        foreach ($definedRoutes as $i => $route) {
+            // Left col with route name
+            $size = strlen($route['name']);
+            if ($size > $leftSize) {
+                $leftSize = $size;
+            }
+
+            // Center col with others data
+            $size = strlen($route['route']);
+            if ($size > $centerSize) {
+                $centerSize = $size;
+            }
+
+            $size = strlen($route['default_controller']);
+            if ($size > $rightSize) {
+                $rightSize = $size;
+            }
+        }
+
+        // Align with head
+        $leftSize += 2;
+        $centerSize += 2;
+        $rightSize += 2;
+
+        $head = $main = '';
+        
+        // Display head bar
+        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
+        $head .= $this->getTextLine(" Route ", $leftSize, " Url ", $centerSize, " Default ", $rightSize);
+        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
+
+        // Display routes properties
+        foreach ($definedRoutes as $i => $route) {
+            $default = $route['default_controller'] ? $route['default_controller'] : "no default params";
+            $main .= $this->getTextLine(
+                " {$route['name']} ", $leftSize, 
+                " {$route['route']} ", $centerSize,
+                " $default ", $rightSize
+            );
+        }
+        $main .= $this->getPatternLine($leftSize, $centerSize, $rightSize) . PHP_EOL;
+    
+        // Check each route
+        foreach ($definedRoutes as $i => $route) {
+            /*$this->output->writeln([
+                "<comment>{$route['name']}</comment>",
+                "\t<info>Route: {$route['route']}</info>",
+                $route['default_controller'] ? "\tdefault: " . $route['default_controller'] : "\t-no default params",
+            ]);*/
+        }
+        
+        $this->output->writeln($head . $main);
+    }
+
+    /**
+     * Get all routes from container configuration
      *
      * @throws RuntimeException
      */
@@ -116,12 +183,12 @@ class DebugRoutesCommand extends AbstractCommand
      */
     protected function getData(string $routeName, array $routeData): array
     {
-        if (!$routeData) {
+        if (! $routeData) {
             throw new RuntimeException(sprintf('Missing route configuration in %s', $routeName));
         }
 
-        $opt   = $this->getFoundChild('options', $routeData);
-        if (!$opt) {
+        $opt = $this->getFoundChild('options', $routeData);
+        if (! $opt) {
             throw new RuntimeException(sprintf("Missing options configuration in %s", $routeName));
         }
 
@@ -129,11 +196,11 @@ class DebugRoutesCommand extends AbstractCommand
 
         // Default options
         $defaults = $this->getFoundChild('defaults', $opt);
-        $ctrl = null;
+        $ctrl     = null;
         if ($defaults) {
-            $ctrl     = $this->getFoundChild('controller', $defaults);
-            $action   = $this->getFoundChild('action', $defaults);
-        } 
+            $ctrl   = $this->getFoundChild('controller', $defaults);
+            $action = $this->getFoundChild('action', $defaults);
+        }
 
         // Return values
         return [
@@ -141,32 +208,5 @@ class DebugRoutesCommand extends AbstractCommand
             'route'              => $route,
             'default_controller' => $ctrl ? $ctrl . '::' . $action : null,
         ];
-    }
-
-    protected function toArrayIterator(array $array): RecursiveIteratorIterator
-    {
-        $iter = new RecursiveArrayIterator($array);
-        return new RecursiveIteratorIterator($iter, RecursiveIteratorIterator::SELF_FIRST);
-    }
-
-    /**
-     * Return child value if $key found
-     *
-     * @return null|mixed
-     */
-    protected function getFoundChild(?string $key, array $parentArray)
-    {
-        if (! $key) {
-            return null;
-        }
-        if (! is_array($parentArray) || is_a($parentArray, 'Iterator')) {
-            return null;
-        }
-        foreach ($parentArray as $k => $child) {
-            if ($k === $key) {
-                return $child;
-            }
-        }
-        return null;
     }
 }

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @license https://opensource.org/licenses/MIT License
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace LmConsole\Command;
 
 use PHPUnit\Framework\TestCase;
@@ -8,29 +15,58 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class DebugEventsCommandTest extends TestCase
 {
+    protected $command;
+    protected $output;
+    protected $definition;
+
     public function setUp(): void
     {
-    }
+        $this->command = new DebugEventsCommand;
+        $this->output  = new BufferedOutput;
 
-    public function testExecute()
-    {
-        $command = new DebugEventsCommand;
-        $output  = new BufferedOutput;
-
-        $definition = new InputDefinition([
+        $this->definition = new InputDefinition([
             new InputArgument('command', InputArgument::REQUIRED),
             new InputArgument('route_name', InputArgument::OPTIONAL),
             new InputArgument('event_name', InputArgument::OPTIONAL),
         ]);
+    }
 
+    public function testExecute()
+    {
         $input = new ArrayInput([
             'command'    => 'debug:events',
-            'route_name' => '/',
-            'event_name' => ''
-        ], $definition);
+            'route_name' => '/test1'
+        ], $this->definition);
         
-        $command->execute($input, $output);
-        echo "\n" . $output->fetch();
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
+
+        $this->expectOutputRegex("/Priority | Callable/");
+    }
+
+    public function testWithRoute()
+    {
+        $input = new ArrayInput([
+            'command'    => 'debug:events',
+            'route_name' => '/test1'
+        ], $this->definition);
+        
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
+
+        $this->expectOutputRegex("/Priority | Callable/");
+    }
+
+    public function testWithRouteAndEvent()
+    {
+        $input = new ArrayInput([
+            'command'    => 'debug:events',
+            'route_name' => '/test1',
+            'event_name' => ''
+        ], $this->definition);
+        
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
 
         $this->expectOutputRegex("/Priority | Callable/");
     }
