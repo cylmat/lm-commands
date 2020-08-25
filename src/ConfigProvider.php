@@ -62,12 +62,12 @@ class ConfigProvider
         // Retrieve COMMAND [arguments] list
         $commandsList = [];
         foreach ($commands as $command) {
-            $key                  = $command::getDefaultName() . ' ' . $command::getDefaultArguments();
+            $key                  = $command::getDefaultName(); 
             $commandsList[ $key ] = $command;
         }
 
         return [
-            'commands' => $commandsList,
+            'commands' => $commandsList
         ];
     }
 }

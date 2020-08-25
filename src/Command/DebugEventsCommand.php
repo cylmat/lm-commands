@@ -24,9 +24,6 @@ class DebugEventsCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'debug:events';
 
-    /** @var string */
-    protected static $listArguments = '[route_name] [event_name]';
-
     /** @var array */
     protected static $defaultArguments = [
         'route' => '/'

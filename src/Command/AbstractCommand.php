@@ -32,9 +32,6 @@ class AbstractCommand extends Command
     /** @var string */
     protected static $defaultName;
 
-    /** @var string */
-    protected static $listArguments;
-
     /**
      * {@inheritDoc}
      */
@@ -44,18 +41,6 @@ class AbstractCommand extends Command
             throw new DomainException("Please provide a default command name for " . static::class . " class");
         }
         return parent::getDefaultName();
-    }
-
-    /**
-     * Get a string displaying the defaults arguments used in this command
-     */
-    public static function getDefaultArguments(): string
-    {
-        if (! static::$listArguments) {
-            throw new DomainException("Please provide some default arguments for " . static::class
-                . " class. Did you omit the argument 's'?");
-        }
-        return static::$listArguments;
     }
 
     /**
