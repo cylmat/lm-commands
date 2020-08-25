@@ -72,18 +72,67 @@ class DebugRoutesCommand extends AbstractCommand
      */
     protected function displayRoutes(array $definedRoutes): void
     {
+        // Get size of columns
+        $leftSize = 40; //default value
+        $centerSize = 50;
+        $rightSize = 50;
+
+        foreach ($definedRoutes as $i => $route) {
+            // Left col with route name
+            $size = strlen($route['name']);
+            if ($size > $leftSize) {
+                $leftSize = $size;
+            }
+
+            // Center col with others data
+            $size = strlen($route['route']);
+            if ($size > $centerSize) {
+                $centerSize = $size;
+            }
+
+            $size = strlen($route['default_controller']);
+            if ($size > $rightSize) {
+                $rightSize = $size;
+            }
+        }
+
+        // Align with head
+        $leftSize += 2;
+        $centerSize += 2;
+        $rightSize += 2;
+
+        $head = $main = '';
+        
+        // Display head bar
+        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
+        $head .= $this->getTextLine(" Route ", $leftSize, " Url ", $centerSize, " Default ", $rightSize);
+        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
+
+        // Display routes properties
+        foreach ($definedRoutes as $i => $route) {
+            $default = $route['default_controller'] ? $route['default_controller'] : "no default params";
+            $main .= $this->getTextLine(
+                " {$route['name']} ", $leftSize, 
+                " {$route['route']} ", $centerSize,
+                " $default ", $rightSize
+            );
+        }
+        $main .= $this->getPatternLine($leftSize, $centerSize, $rightSize) . PHP_EOL;
+    
         // Check each route
         foreach ($definedRoutes as $i => $route) {
-            $this->output->writeln([
+            /*$this->output->writeln([
                 "<comment>{$route['name']}</comment>",
                 "\t<info>Route: {$route['route']}</info>",
                 $route['default_controller'] ? "\tdefault: " . $route['default_controller'] : "\t-no default params",
-            ]);
+            ]);*/
         }
+        
+        $this->output->writeln($head . $main);
     }
 
     /**
-     * Get container configuration
+     * Get all routes from container configuration
      *
      * @throws RuntimeException
      */

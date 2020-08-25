@@ -46,7 +46,7 @@ class DebugEventsCommand extends AbstractCommand
 
         $inputRoute = $input->getArgument('route_name') ?? self::$defaultArguments['route'];
         $inputEvent = $input->getArgument('event_name');
-        
+
         $eventsList = $this->getEventsFromRoute($inputRoute, $inputEvent);
         $this->displayTemplate($eventsList);
 
@@ -164,9 +164,12 @@ class DebugEventsCommand extends AbstractCommand
         // Get max propertie text size
         foreach ($eventProperties as $priority => $callable) {
             if (strlen($callable) > $centerSize) {
-                $centerSize = strlen($callable) + 2; // count with '()' size
+                $centerSize = strlen($callable); 
             }
         }
+
+        // Align with head
+        $centerSize += 2; // count with '()' size
 
         // Display event name
         $head = ' [' . $eventName . ']' . PHP_EOL;

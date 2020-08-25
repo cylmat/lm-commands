@@ -16,25 +16,32 @@ trait DisplayTrait
     /**
      * Get rendered pattern line
      */
-    protected function getPatternLine(int $leftSize, int $centerSize): string
+    protected function getPatternLine(int $leftSize, int $centerSize, ?int $rightSize=null): string
     {
         $cross = '+';
         $dash  = '-';
 
         return $cross . $this->repeatPattern($dash, $leftSize)
                 . $cross . $this->repeatPattern($dash, $centerSize)
+                . ($rightSize ? $cross . $this->repeatPattern($dash, $rightSize) : '') // Right column
                 . $cross . PHP_EOL;
     }
 
     /**
      * Get rendered text line
      */
-    protected function getTextLine(string $leftText, int $leftSize, string $centerText, int $centerSize): string
+    protected function getTextLine(
+        string $leftText, int $leftSize, 
+        string $centerText, int $centerSize,
+        ?string $rightText=null, ?int $rightSize=null): string
     {
         $pipe = '|';
 
-        return $pipe . str_pad($leftText, $leftSize, ' ') . $pipe
-                . str_pad($centerText, $centerSize, ' ') . $pipe . PHP_EOL;
+        return $pipe
+                . str_pad($leftText, $leftSize, ' ') . $pipe
+                . str_pad($centerText, $centerSize, ' ') . $pipe 
+                . ($rightSize ? str_pad($rightText, $rightSize, ' ') . $pipe : '') // Right column
+                . PHP_EOL;
     }
 
     /**
