@@ -19,17 +19,18 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use const PHP_EOL;
-
 class DebugEventsCommand extends AbstractCommand
 {
     /** @var string */
     protected static $defaultName = 'debug:events';
 
     /** @var string */
-    protected static $defaultArguments = '[route_name] [event_name]';
+    protected static $listArguments = '[route_name] [event_name]';
 
-    protected static $default_route = '/';
+    /** @var array */
+    protected static $defaultArguments = [
+        'route' => '/'
+    ];
     
     /**
      * Execute action
@@ -39,10 +40,13 @@ class DebugEventsCommand extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         parent::execute($input, $output);
-        $output->writeln(["<comment> - Events of application</comment>", "========================"]);
+        
+        // Display head
+        $this->displayHead("Events of application");
 
-        $inputRoute = $input->getArgument('route_name') ?? self::$default_route;
+        $inputRoute = $input->getArgument('route_name') ?? self::$defaultArguments['route'];
         $inputEvent = $input->getArgument('event_name');
+        
         $eventsList = $this->getEventsFromRoute($inputRoute, $inputEvent);
         $this->displayTemplate($eventsList);
 

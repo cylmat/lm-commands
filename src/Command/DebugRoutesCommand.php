@@ -12,8 +12,6 @@
 namespace LmConsole\Command;
 
 use Laminas\Cli\ContainerResolver;
-use RecursiveArrayIterator;
-use RecursiveIteratorIterator;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,7 +24,7 @@ class DebugRoutesCommand extends AbstractCommand
     protected static $defaultName = 'debug:routes';
 
     /** @var string List of arguments */
-    protected static $defaultArguments = '[route_name]';
+    protected static $listArguments = '[route_name]';
 
     /**
      * Execute action
@@ -35,13 +33,20 @@ class DebugRoutesCommand extends AbstractCommand
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
+        parent::execute($input, $output);
+
+        // All routes
         $routes = $definedRoutes = $this->getRoutes($input);
 
+        // One single route in Input
         if ($input->hasArgument('route_name') && isset($routes[$input->getArgument('route_name')])) {
             $routes = $routes[$input->getArgument('route_name')];
         }
-        $output->writeln(["<comment>Routes of application</comment>", "============"]);
+
+        // Display head
+        $this->displayHead("Routes of application");
         
+        // Check each route
         foreach ($definedRoutes as $i => $route) {
             $output->writeln([
                 "<comment>{$route['name']}</comment>",
@@ -149,33 +154,5 @@ class DebugRoutesCommand extends AbstractCommand
         ];
     }
 
-    /**
-     * Change array to iterator
-     */
-    protected function toArrayIterator(array $array): RecursiveIteratorIterator
-    {
-        $iter = new RecursiveArrayIterator($array);
-        return new RecursiveIteratorIterator($iter, RecursiveIteratorIterator::SELF_FIRST);
-    }
-
-    /**
-     * Return child value if $key found
-     *
-     * @return null|mixed
-     */
-    protected function getFoundChild(?string $key, array $parentArray)
-    {
-        if (! $key) {
-            return null;
-        }
-        if (! is_array($parentArray) || is_a($parentArray, 'Iterator')) {
-            return null;
-        }
-        foreach ($parentArray as $k => $child) {
-            if ($k === $key) {
-                return $child;
-            }
-        }
-        return null;
-    }
+    
 }

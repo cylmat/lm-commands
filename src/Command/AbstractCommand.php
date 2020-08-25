@@ -12,12 +12,17 @@
 namespace LmConsole\Command;
 
 use DomainException;
+use LmConsole\Traits\DisplayTrait;
+use LmConsole\Traits\ToolsTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractCommand extends Command
 {
+    use DisplayTrait;
+    use ToolsTrait;
+
     /** @var InputInterface */
     protected $input;
     
@@ -28,7 +33,7 @@ class AbstractCommand extends Command
     protected static $defaultName;
 
     /** @var string */
-    protected static $defaultArguments;
+    protected static $listArguments;
 
     /**
      * {@inheritDoc}
@@ -46,11 +51,11 @@ class AbstractCommand extends Command
      */
     public static function getDefaultArguments(): string
     {
-        if (! static::$defaultArguments) {
+        if (! static::$listArguments) {
             throw new DomainException("Please provide some default arguments for " . static::class
                 . " class. Did you omit the argument 's'?");
         }
-        return static::$defaultArguments;
+        return static::$listArguments;
     }
 
     /**
@@ -65,43 +70,13 @@ class AbstractCommand extends Command
     }
 
     /**
-     * Display an error message to output
+     * Display head
      */
-    protected function sendError(string $message): void
+    public function displayHead(string $title): void
     {
-        $message = "ERROR: $message";
-        $this->output->writeln($message);
-    }
+        $subtitle = '=';
 
-    /**
-     * Get rendered pattern line
-     */
-    protected function getPatternLine(int $leftSize, int $centerSize): string
-    {
-        $cross = '+';
-        $dash  = '-';
-
-        return $cross . $this->getPattern($dash, $leftSize)
-                . $cross . $this->getPattern($dash, $centerSize)
-                . $cross . PHP_EOL;
-    }
-
-    /**
-     * Get rendered text line
-     */
-    protected function getTextLine(string $leftText, int $leftSize, string $centerText, int $centerSize): string
-    {
-        $pipe = '|';
-
-        return $pipe . str_pad($leftText, $leftSize, ' ') . $pipe
-                . str_pad($centerText, $centerSize, ' ') . $pipe . PHP_EOL;
-    }
-
-    /**
-     * Get a repeated $pattern of $size
-     */
-    protected function getPattern(string $pattern, int $size): string
-    {
-        return str_pad('', $size, $pattern);
+        $this->output->writeln("<comment>$title</comment>");
+        $this->output->writeln($this->repeatPattern($subtitle, strlen($title)));
     }
 }
