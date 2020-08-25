@@ -46,14 +46,9 @@ class DebugRoutesCommand extends AbstractCommand
         // Display head
         $this->displayHead("Routes of application");
         
-        // Check each route
-        foreach ($definedRoutes as $i => $route) {
-            $output->writeln([
-                "<comment>{$route['name']}</comment>",
-                "\t<info>Route: {$route['route']}</info>",
-                $route['default_controller'] ? "\tdefault: " . $route['default_controller'] : "\t-no default params",
-            ]);
-        }
+        // Display routes
+        $this->displayRoutes($routes);
+
         return Command::SUCCESS;
     }
 
@@ -70,6 +65,21 @@ class DebugRoutesCommand extends AbstractCommand
             // The short description shown while running "php bin/console list"
             ->setDescription('Debug routes from [route_name] or all routes')
             ->setHelp('This command allows you to show a list of all routes ans their associated controllers');
+    }
+
+    /**
+     * Display routes
+     */
+    protected function displayRoutes(array $definedRoutes): void
+    {
+        // Check each route
+        foreach ($definedRoutes as $i => $route) {
+            $this->output->writeln([
+                "<comment>{$route['name']}</comment>",
+                "\t<info>Route: {$route['route']}</info>",
+                $route['default_controller'] ? "\tdefault: " . $route['default_controller'] : "\t-no default params",
+            ]);
+        }
     }
 
     /**
@@ -153,6 +163,4 @@ class DebugRoutesCommand extends AbstractCommand
             'default_controller' => $ctrl ? $ctrl . '::' . $action : null,
         ];
     }
-
-    
 }
