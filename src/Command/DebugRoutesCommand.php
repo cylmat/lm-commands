@@ -117,15 +117,6 @@ class DebugRoutesCommand extends AbstractCommand
             );
         }
         $main .= $this->getPatternLine($leftSize, $centerSize, $rightSize) . PHP_EOL;
-    
-        // Check each route
-        foreach ($definedRoutes as $i => $route) {
-            /*$this->output->writeln([
-                "<comment>{$route['name']}</comment>",
-                "\t<info>Route: {$route['route']}</info>",
-                $route['default_controller'] ? "\tdefault: " . $route['default_controller'] : "\t-no default params",
-            ]);*/
-        }
         
         $this->output->writeln($head . $main);
     }
@@ -137,13 +128,8 @@ class DebugRoutesCommand extends AbstractCommand
      */
     protected function getRoutes(InputInterface $input): array
     {
-        $config    = $this->getConfig();
-        $router    = $this->getFoundChild('router', $config);
-        $allRoutes = $this->getFoundChild('routes', $router);
-        
-        if (! $allRoutes) {
-            throw new RuntimeException("Routes are not defined in configuration file.");
-        }
+        $config    = $this->getApplicationConfig();
+        $allRoutes = $this->getRoutesFromConfig($config);
 
         $routeStack = [];
         $routeName  = $input->getArgument('route_name');
@@ -159,23 +145,6 @@ class DebugRoutesCommand extends AbstractCommand
         }
 
         return $routeStack;
-    }
-
-    /**
-     * Get container configuration
-     *
-     * @throws RuntimeException
-     */
-    protected function getConfig(): array
-    {
-        // Services
-        if (! $container = ContainerResolver::resolve()) {
-            throw new RuntimeException("Configuration file is not provided");
-        }
-        if (! $container->get('config')) {
-            throw new RuntimeException("Configuration data is not provided");
-        }
-        return $container->get('config');
     }
 
     /**

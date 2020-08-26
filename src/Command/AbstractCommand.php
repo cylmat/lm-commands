@@ -12,16 +12,15 @@
 namespace LmConsole\Command;
 
 use DomainException;
-use LmConsole\Traits\DisplayTrait;
-use LmConsole\Traits\ToolsTrait;
+use LmConsole\Traits\{ConfigTrait, DisplayTrait, ToolsTrait};
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractCommand extends Command
 {
-    use DisplayTrait;
-    use ToolsTrait;
+    // Traits
+    use DisplayTrait, ToolsTrait, ConfigTrait;
 
     /** @var InputInterface */
     protected $input;

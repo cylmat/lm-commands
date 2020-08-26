@@ -7,10 +7,10 @@
  * file that was distributed with this source code.
  */
 
-
 namespace LmConsole;
 
 use Laminas\Router\Http\Literal;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 class ConfigProvider
 {
@@ -18,6 +18,12 @@ class ConfigProvider
     {
         return [
             'laminas-cli' => $this->getCliConfig(),
+
+            'controllers' => [
+                'factories' => [
+                    TestController\TestController::class => InvokableFactory::class
+                ],
+            ],
 
             // For unit testing framework
             'view_manager' => [
@@ -33,7 +39,7 @@ class ConfigProvider
                     'test1' => [
                         'type'    => Literal::class,
                         'options' => [
-                            'route' => '/testing-url-1',
+                            'route' => '/testing-url-1[/controller:]',
                         ],
                     ],
                     'test2' => [
@@ -42,6 +48,20 @@ class ConfigProvider
                             'route' => '/testing-url-2',
                         ],
                     ],
+                    'test3' => [
+                        'type'    => Literal::class,
+                        'options' => [
+                            'route'    => '/', //'/album-tuto[/:action[/:id]]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z][a-zA-Z0-9]*',
+                                'id' => '[0-9]*'
+                            ],
+                            'defaults' => [
+                                'controller' => TestController\TestController::class,
+                                'action'     => 'index',
+                            ],
+                        ],
+                    ]
                 ],
             ],
         ];

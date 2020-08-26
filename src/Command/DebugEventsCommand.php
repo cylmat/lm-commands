@@ -14,6 +14,7 @@ namespace LmConsole\Command;
 use Interop\Container\ContainerInterface;
 use Laminas\Mvc\Application;
 use LmConsole\Command\DebugEventsModel\EventDebuggerManager;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,9 +25,9 @@ class DebugEventsCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'debug:events';
 
-    /** @var array */
-    protected static $defaultArguments = [
-        'route' => '/'
+    /** @var string */
+    protected static $defaultArgument = [
+        'route_url' => '/'
     ];
     
     /**
@@ -41,7 +42,7 @@ class DebugEventsCommand extends AbstractCommand
         // Display head
         $this->displayHead("Events of application");
 
-        $inputRoute = $input->getArgument('route_name') ?? self::$defaultArguments['route'];
+        $inputRoute = $input->getArgument('route_url'); //take '/' by default
         $inputEvent = $input->getArgument('event_name');
 
         $eventsList = $this->getEventsFromRoute($inputRoute, $inputEvent);
@@ -58,17 +59,17 @@ class DebugEventsCommand extends AbstractCommand
     protected function configure(): void
     {
         $this
-            ->addArgument('route_name', InputArgument::OPTIONAL, "The module route name (e.g.: 'myroute'), or will check the home otherwise.")
-            ->addArgument('event_name', InputArgument::OPTIONAL, "The event name, or show all events for the specific route.");
+            ->addArgument('route_url', InputArgument::OPTIONAL, "The route url (e.g.: 'my-url/') to test, or will check the '/' otherwise.")
+            ->addArgument('event_name', InputArgument::OPTIONAL, "The event name, or show all events for the specified url.");
 
         $this
             // The short description shown while running "php bin/console list"
             ->setDescription("Debug all the events of the application.")
             ->setHelp(
                 "This command allows you to show a list of all events of the application\n" . 
-                "The default value of route is the home one.\n" . 
+                "The default value of route is the '/' one.\n" . 
                 "You can select a specific event.\n" . 
-                "\te.g: bin/laminas myroute myevent" 
+                "\te.g: bin/laminas my-url myevent" 
             );
     }
 
@@ -76,7 +77,7 @@ class DebugEventsCommand extends AbstractCommand
      * Get Application configuration
      * included an EventManager which can debug all Events
      */
-    protected function getApplicationConfig(): array
+    protected function getServiceConfig(): array
     {
         return [
             'service_manager' => [
@@ -84,7 +85,7 @@ class DebugEventsCommand extends AbstractCommand
                     'EventManager' => function (ContainerInterface $container, $name, ?array $options = null) {
                         $shared = $container->has('SharedEventManager') ? $container->get('SharedEventManager') : null;
                         return new EventDebuggerManager($shared);
-                    },
+                    }
                 ],
             ],
         ];
@@ -93,14 +94,19 @@ class DebugEventsCommand extends AbstractCommand
     /**
      * Simulate an MVC application and get all Events on the dispatched route
      */
-    protected function getEventsFromRoute(string $inputRoute, ?string $inputEventName): array
+    protected function getEventsFromRoute(?string $inputRoute, ?string $inputEventName): array
     {
         $config        = require __DIR__ . '/../../config/application.config.php';
-        $serviceConfig = $this->getApplicationConfig();
+        $serviceConfig = $this->getServiceConfig();
 
         $config = array_merge($config, $serviceConfig);
-        
-        $application  = Application::init($config)->run();
+
+        // Launch application
+        $_SERVER['REQUEST_URI'] = '/'; //$inputRoute ?? '/';
+        $application = Application::init($config);
+        $application->run();
+
+        // Get events
         $eventManager = $application->getEventManager(); //EventDebuggerManager
         $eventsList   = $eventManager->getEventsList($inputEventName);
 
