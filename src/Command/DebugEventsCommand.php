@@ -58,14 +58,17 @@ class DebugEventsCommand extends AbstractCommand
     protected function configure(): void
     {
         $this
-            ->addArgument('route_name', InputArgument::OPTIONAL, "The module route name, will be '/' otherwise.")
-            ->addArgument('event_name', InputArgument::OPTIONAL, "The event name, or show all events.");
+            ->addArgument('route_name', InputArgument::OPTIONAL, "The module route name (e.g.: 'myroute'), or will check the home otherwise.")
+            ->addArgument('event_name', InputArgument::OPTIONAL, "The event name, or show all events for the specific route.");
 
         $this
             // The short description shown while running "php bin/console list"
-            ->setDescription('Debug events of application')
+            ->setDescription("Debug all the events of the application.")
             ->setHelp(
-                "This command allows you to show a list of all events of the application"
+                "This command allows you to show a list of all events of the application\n" . 
+                "The default value of route is the home one.\n" . 
+                "You can select a specific event.\n" . 
+                "\te.g: bin/laminas myroute myevent" 
             );
     }
 
@@ -88,8 +91,7 @@ class DebugEventsCommand extends AbstractCommand
     }
 
     /**
-     * Simulate an MVC application
-     * and get all Events on the dispatched route
+     * Simulate an MVC application and get all Events on the dispatched route
      */
     protected function getEventsFromRoute(string $inputRoute, ?string $inputEventName): array
     {

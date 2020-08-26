@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Autoloading commands from modules
 
-## [0.2.0] - 2020-08-22
+## [0.2.0] - 2020-08-25
 ### Added
 - DebugEvents command
 - AbstractCommand file

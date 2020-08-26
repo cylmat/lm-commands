@@ -57,11 +57,13 @@ class DebugRoutesCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->addArgument('route_name', InputArgument::OPTIONAL, 'The module route name.');
+            ->addArgument('route_name', InputArgument::OPTIONAL, "The module route name.");
         $this
             // The short description shown while running "php bin/console list"
-            ->setDescription('Debug routes from [route_name] or all routes')
-            ->setHelp('This command allows you to show a list of all routes ans their associated controllers');
+            ->setDescription("Debug routes from [route_name] or all routes.")
+            ->setHelp(
+                "This command allows you to show a list of all routes ans their associated controllers"
+            );
     }
 
     /**
