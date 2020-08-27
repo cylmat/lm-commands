@@ -24,18 +24,17 @@ class DebugEventsCommandTest extends TestCase
         $this->command = new DebugEventsCommand;
         $this->output  = new BufferedOutput;
 
-        $this->definition = new InputDefinition([
-            new InputArgument('command', InputArgument::REQUIRED),
-            new InputArgument('route_name', InputArgument::OPTIONAL),
-            new InputArgument('event_name', InputArgument::OPTIONAL),
-        ]);
+        $this->definition = new InputDefinition(array_merge(
+            [new InputArgument('command', InputArgument::REQUIRED)],
+            $this->command->getDefinition()->getArguments()
+        ));
     }
 
     public function testExecute()
     {
         $input = new ArrayInput([
             'command'    => 'debug:events',
-            'route_name' => '/test1'
+            'route_url' => '/test1'
         ], $this->definition);
         
         $this->command->execute($input, $this->output);
@@ -48,7 +47,7 @@ class DebugEventsCommandTest extends TestCase
     {
         $input = new ArrayInput([
             'command'    => 'debug:events',
-            'route_name' => '/test1'
+            'route_url' => '/test1'
         ], $this->definition);
         
         $this->command->execute($input, $this->output);
@@ -61,7 +60,7 @@ class DebugEventsCommandTest extends TestCase
     {
         $input = new ArrayInput([
             'command'    => 'debug:events',
-            'route_name' => '/test1',
+            'route_url' => '/test1',
             'event_name' => ''
         ], $this->definition);
         

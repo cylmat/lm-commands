@@ -24,10 +24,10 @@ class DebugRoutesCommandTest extends TestCase
         $this->command = new DebugRoutesCommand;
         $this->output  = new BufferedOutput;
 
-        $this->definition = new InputDefinition([
-            new InputArgument('command', InputArgument::REQUIRED),
-            new InputArgument('route_name', InputArgument::OPTIONAL),
-        ]);
+        $this->definition = new InputDefinition(array_merge(
+            [new InputArgument('command', InputArgument::REQUIRED)],
+            $this->command->getDefinition()->getArguments()
+        ));
     }
 
     public function testExecute()
