@@ -45,4 +45,19 @@ trait ToolsTrait
         }
         return null;
     }
+
+    /**
+     * Check levenstein for one item against list
+     */
+    protected function checkArgSpell(string $argName, array $itemsList, int $count=5): array
+    {
+        // Results founds
+        $results = [];
+        foreach ($itemsList as $item) {
+            if (levenshtein($argName, $item) < $count) {
+                $results[] = $item;
+            }
+        }
+        return $results;
+    }
 }

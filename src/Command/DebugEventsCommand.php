@@ -125,15 +125,17 @@ class DebugEventsCommand extends AbstractCommand
     {
         $eventsList = $eventManager->getEventsList();
 
-        $result = [];
-        foreach ($eventsList as $eventName => $properties) {
-            if (levenshtein($eventName, $inputEventName) < 5) {
-                $result[] = $eventName;
-            }
+        $eventsNames = array_keys($eventsList);
+        $results = $this->checkArgSpell($inputEventName, $eventsNames);
+
+        if (!$results) {
+            $msg = "We couldn't find event '$inputEventName'." . PHP_EOL;
+            $this->sendError($msg);
+            return;
         }
 
         $msg = "We couldn't find event '$inputEventName'. Did you mean one of these?" . PHP_EOL;
-        foreach ($result as $existsName) {
+        foreach ($results as $existsName) {
             $msg .= ' - ' . $existsName . PHP_EOL;
         }
         $this->sendError($msg);
