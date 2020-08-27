@@ -22,12 +22,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DebugEventsCommand extends AbstractCommand
 {
+    protected const ROUTE_URL = 'route_url';
+    protected const EVENT_NAME = 'event_name';
+    
     /** @var string */
     protected static $defaultName = 'debug:events';
 
     /** @var string */
-    protected static $defaultArgument = [
-        'route_url' => '/'
+    protected static $defaultArguments = [
+        self::ROUTE_URL => '/'
     ];
     
     /**
@@ -42,10 +45,10 @@ class DebugEventsCommand extends AbstractCommand
         // Display head
         $this->displayHead("Events of application");
 
-        $inputRoute = $input->getArgument('route_url'); //take '/' by default
-        $inputEvent = $input->getArgument('event_name');
+        $inputUrl = $input->getArgument(self::ROUTE_URL); //take '/' by default
+        $inputEvent = $input->getArgument(self::EVENT_NAME);
 
-        $eventsList = $this->getEventsFromRoute($inputRoute, $inputEvent);
+        $eventsList = $this->getEventsFromUrl($inputUrl, $inputEvent);
         $this->displayTemplate($eventsList);
 
         return Command::SUCCESS;
@@ -59,8 +62,8 @@ class DebugEventsCommand extends AbstractCommand
     protected function configure(): void
     {
         $this
-            ->addArgument('route_url', InputArgument::OPTIONAL, "The route url (e.g.: 'my-url/') to test, or will check the '/' otherwise.")
-            ->addArgument('event_name', InputArgument::OPTIONAL, "The event name, or show all events for the specified url.");
+            ->addArgument(self::ROUTE_URL, InputArgument::OPTIONAL, "The route url (e.g.: 'my-url/') to test, or will check the '/' otherwise.")
+            ->addArgument(self::EVENT_NAME, InputArgument::OPTIONAL, "The event name, or show all events for the specified url.");
 
         $this
             // The short description shown while running "php bin/console list"
@@ -92,9 +95,9 @@ class DebugEventsCommand extends AbstractCommand
     }
 
     /**
-     * Simulate an MVC application and get all Events on the dispatched route
+     * Simulate an MVC application and get all Events on the dispatched url
      */
-    protected function getEventsFromRoute(?string $inputRoute, ?string $inputEventName): array
+    protected function getEventsFromUrl(?string $inputUrl, ?string $inputEventName): array
     {
         $config        = require __DIR__ . '/../../config/application.config.php';
         $serviceConfig = $this->getServiceConfig();
@@ -102,7 +105,7 @@ class DebugEventsCommand extends AbstractCommand
         $config = array_merge($config, $serviceConfig);
 
         // Launch application
-        $_SERVER['REQUEST_URI'] = '/'; //$inputRoute ?? '/';
+        $_SERVER['REQUEST_URI'] = $inputUrl ?? self::$defaultArguments[self::ROUTE_URL];
         $application = Application::init($config);
         $application->run();
 
