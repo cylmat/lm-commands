@@ -10,6 +10,7 @@
 namespace LmConsole\Command;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Input\{ArrayInput, InputDefinition, InputArgument};
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -30,7 +31,7 @@ class DebugRoutesCommandTest extends TestCase
         ));
     }
 
-    public function testExecute()
+    public function testDefault()
     {
         $input = new ArrayInput([
             'command'    => 'debug:routes'
@@ -53,5 +54,18 @@ class DebugRoutesCommandTest extends TestCase
         echo "\n" . $this->output->fetch();
 
         $this->expectOutputRegex("/testing-url-1/");
+    }
+
+    public function testWithFalseRoute()
+    {
+        $input = new ArrayInput([
+            'command'    => 'debug:routes',
+            'route_name' => 'no_exists_route',
+        ], $this->definition);
+        
+        $this->expectException(RuntimeException::class);
+        
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
     }
 }

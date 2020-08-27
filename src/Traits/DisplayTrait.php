@@ -57,7 +57,7 @@ trait DisplayTrait
      */
     protected function sendError(string $message): void
     {
-        $message = "ERROR: $message";
+        $message = "ERROR: $message \n";
         $this->output->writeln($message);
     }
 }

@@ -17,7 +17,7 @@ class TestController extends AbstractActionController
 {
     public function indexAction()
     {
-        $this->getEventManager()->attach('try.service', function($e){
+        $this->getEventManager()->attach('test.event', new class {function __invoke($e){
             $event = $e->getName();
             $params = $e->getParams();
             
@@ -26,6 +26,6 @@ class TestController extends AbstractActionController
                 $event,
                 json_encode($params)
             );
-        }, 567);
+        }}, 1234567);
     }
 }

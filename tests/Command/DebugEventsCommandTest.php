@@ -30,11 +30,10 @@ class DebugEventsCommandTest extends TestCase
         ));
     }
 
-    public function testExecute()
+    public function testDefault()
     {
         $input = new ArrayInput([
-            'command'    => 'debug:events',
-            'route_url' => '/test1'
+            'command'    => 'debug:events'
         ], $this->definition);
         
         $this->command->execute($input, $this->output);
@@ -61,12 +60,26 @@ class DebugEventsCommandTest extends TestCase
         $input = new ArrayInput([
             'command'    => 'debug:events',
             'route_url' => '/test1',
-            'event_name' => ''
+            'event_name' => 'bootstrap'
         ], $this->definition);
         
         $this->command->execute($input, $this->output);
         echo "\n" . $this->output->fetch();
 
-        $this->expectOutputRegex("/Priority | Callable/");
+        $this->expectOutputRegex("/\[bootstrap\]/");
+    }
+
+    public function testWithErrorEvent()
+    {
+        $input = new ArrayInput([
+            'command'    => 'debug:events',
+            'route_url' => '/test1',
+            'event_name' => 'a_bootstrap'
+        ], $this->definition);
+        
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
+
+        $this->expectOutputRegex("/We couldn't find event 'a_bootstrap'/");
     }
 }
