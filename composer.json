@@ -44,5 +44,10 @@
         "psr-4": {
             "LmConsole\\":"src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LmConsoleTest\\":"tests/LmConsoleTest"
+        }
     }
 }

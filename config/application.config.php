@@ -9,8 +9,9 @@
  */
 return [
     'modules' => [
-        'Laminas\Router', // Used for DebugRoutessCommand
-        'LmConsole'
+        'Laminas\Router', // Used for DebugRoutesCommand
+        'LmConsole',
+        'LmConsoleTest'
     ],
 
     'module_listener_options' => [
