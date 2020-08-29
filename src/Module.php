@@ -13,6 +13,32 @@ class Module
 {
     public function getConfig(): array
     {
-        return (new ConfigProvider)();
+        return [
+            'laminas-cli' => $this->getCliConfig()
+        ];
+    }
+
+    protected function getCliConfig(): array
+    {
+        $commands = null;
+        if (! isset($GLOBALS[Model\GlobalConfigRetriever::GLOBAL_REDUNDANCE_AVOIDER])) {
+            $commands = Model\ModuleCommandLoader::getModulesCommands();
+        }
+
+        if (! $commands) {
+            return [];
+        }
+
+        // Get list of all modules commandes
+        // Retrieve COMMAND [arguments] list
+        $commandsList = [];
+        foreach ($commands as $command) {
+            $key                  = $command::getDefaultName(); 
+            $commandsList[ $key ] = $command;
+        }
+
+        return [
+            'commands' => $commandsList
+        ];
     }
 }
