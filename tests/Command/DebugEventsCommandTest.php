@@ -76,10 +76,10 @@ class DebugEventsCommandTest extends TestCase
             'route_url' => '/test1',
             'event_name' => 'a_bootstrap'
         ], $this->definition);
+
+        $this->expectException(\RuntimeException::class);
         
         $this->command->execute($input, $this->output);
         echo "\n" . $this->output->fetch();
-
-        $this->expectOutputRegex("/We couldn't find event 'a_bootstrap'/");
     }
 }
