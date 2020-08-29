@@ -26,7 +26,8 @@ class DebugEventsCommandTest extends TestCase
 
         $this->definition = new InputDefinition(array_merge(
             [new InputArgument('command', InputArgument::REQUIRED)],
-            $this->command->getDefinition()->getArguments()
+            $this->command->getDefinition()->getArguments(),
+            $this->command->getDefinition()->getOptions()
         ));
     }
 
@@ -67,6 +68,20 @@ class DebugEventsCommandTest extends TestCase
         echo "\n" . $this->output->fetch();
 
         $this->expectOutputRegex("/\[bootstrap\]/");
+    }
+
+    public function testWithListOption()
+    {
+        $input = new ArrayInput([
+            'command'    => 'debug:events',
+            'route_url' => '/',
+            '--list' => true
+        ], $this->definition);
+        
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
+
+        $this->expectOutputRegex("/\| sendResponse   /");
     }
 
     public function testWithErrorEvent()

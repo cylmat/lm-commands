@@ -27,7 +27,8 @@ class DebugRoutesCommandTest extends TestCase
 
         $this->definition = new InputDefinition(array_merge(
             [new InputArgument('command', InputArgument::REQUIRED)],
-            $this->command->getDefinition()->getArguments()
+            $this->command->getDefinition()->getArguments(),
+            $this->command->getDefinition()->getOptions()
         ));
     }
 

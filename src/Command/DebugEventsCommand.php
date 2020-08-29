@@ -13,14 +13,15 @@ namespace LmConsole\Command;
 
 use LmConsole\Command\DebugEvents\Factory;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\{InputArgument, InputOption, InputInterface};
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DebugEventsCommand extends AbstractCommand
 {
     public const ROUTE_URL = 'route_url';
     public const EVENT_NAME = 'event_name';
+
+    public const LIST_OPT = 'list';
     
     /** @var string */
     public static $defaultName = 'debug:events';
@@ -44,12 +45,20 @@ class DebugEventsCommand extends AbstractCommand
 
         $inputUrl = $input->getArgument(self::ROUTE_URL); //take '/' by default
         $inputEvent = $input->getArgument(self::EVENT_NAME);
+        $listOpt = $input->getOption(self::LIST_OPT);
 
         $config = Factory::getConfig();
+        $eventsList = $config->getEventsFromUrl($inputUrl, $inputEvent);
+        
         $template = Factory::getTemplate($output);
 
-        $eventsList = $config->getEventsFromUrl($inputUrl, $inputEvent);
-        $template->displayTemplate($eventsList);
+        // Options --list
+        if ($listOpt) {
+            $template->displayEventsList($eventsList);
+        } else {
+            // Full properties
+            $template->displayFullEvents($eventsList);
+        }
 
         return Command::SUCCESS;
     }
@@ -64,6 +73,14 @@ class DebugEventsCommand extends AbstractCommand
         $this
             ->addArgument(self::ROUTE_URL, InputArgument::OPTIONAL, "The route url (e.g.: 'my-url/') to test, or will check the '/' otherwise.")
             ->addArgument(self::EVENT_NAME, InputArgument::OPTIONAL, "The event name, or show all events for the specified url.");
+        
+        $this
+            ->addOption(
+                'list',
+                null,
+                InputOption::VALUE_NONE,
+                'List only names of events'
+            );
 
         $this
             // The short description shown while running "php bin/console list"
@@ -71,8 +88,7 @@ class DebugEventsCommand extends AbstractCommand
             ->setHelp(
                 "This command allows you to show a list of all events of the application\n" . 
                 "The default value of route is the '/' one.\n" . 
-                "You can select a specific event.\n" . 
-                "\te.g: bin/laminas my-url myevent" 
+                "You can select a specific event e.g: bin/laminas my-url myevent" 
             );
     }
 }

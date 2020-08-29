@@ -26,14 +26,25 @@ class Template
     }
 
     /**
-     * Display all events
+     * Display all events wih properties
      */
-    public function displayTemplate(array $eventsList): void
+    public function displayFullEvents(array $eventsList): void
     {
         $output = '';
         foreach ($eventsList as $eventName => $eventProperties) {
-            $output .= $this->getEventTemplate($eventName, $eventProperties);
+            $output .= $this->getEventPropertiesTemplate($eventName, $eventProperties);
         }
+
+        // Final render
+        $this->output->writeln($output);
+    }
+
+    /**
+     * Display only list
+     */
+    public function displayEventsList(array $eventsList): void
+    {
+        $output = $this->getEventListTemplate($eventsList);
 
         // Final render
         $this->output->writeln($output);
@@ -44,7 +55,7 @@ class Template
     /**
      * Get template for one single event
      */
-    protected function getEventTemplate(string $eventName, array $eventProperties): string
+    protected function getEventPropertiesTemplate(string $eventName, array $eventProperties): string
     {
         /*
          * info colors:  black, red, green, yellow, blue, magenta, cyan and white.
@@ -55,11 +66,7 @@ class Template
         $pipe       = '|';
 
         // Get max propertie text size
-        foreach ($eventProperties as $priority => $callable) {
-            if (strlen($callable) > $centerSize) {
-                $centerSize = strlen($callable); 
-            }
-        }
+        $centerSize = $this->getMaxLength($eventProperties);
 
         // Align with head
         $centerSize += 2; // count with '()' size
@@ -78,6 +85,40 @@ class Template
             $main .= $this->getTextLine(" $priority ", $leftSize, " $callable ", $centerSize);
         }
         $main .= $this->getPatternLine($leftSize, $centerSize) . PHP_EOL;
+        return $head . $main;
+    }
+
+    /**
+     * Get template for a list of events with --list option
+     */
+    protected function getEventListTemplate(array $eventList): string
+    {
+        /*
+         * info colors:  black, red, green, yellow, blue, magenta, cyan and white.
+         * info options: bold, underscore, blink, reverse
+         */
+        $leftSize   = 50;
+        $pipe       = '|';
+
+        // Get max propertie text size
+        $centerSize = $this->getMaxLength($eventList, 0);
+
+        // Align with head
+        $centerSize += 2; // count with '()' size
+
+        $head = '';
+
+        // Display head bar
+        $head .= $this->getPatternLine($leftSize);
+        $head .= $this->getTextLine(" Name ", $leftSize);
+        $head .= $this->getPatternLine($leftSize);
+
+        // Display events name
+        $main = '';
+        foreach ($eventList as $name => $properties) {
+            $main .= $this->getTextLine(" $name ", $leftSize);
+        }
+        $main .= $this->getPatternLine($leftSize) . PHP_EOL;
         return $head . $main;
     }
 }
