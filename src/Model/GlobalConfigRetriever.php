@@ -2,6 +2,7 @@
 
 /**
  * Get global configuration file to retrieve list of all modules
+ * Used for autoloading Commands
  * 
  * @license https://opensource.org/licenses/MIT License
  *

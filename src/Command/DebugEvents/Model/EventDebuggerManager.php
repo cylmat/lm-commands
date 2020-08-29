@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace LmConsole\Command\DebugEventsModel;
+namespace LmConsole\Command\DebugEvents\Model;
 
 use Laminas\EventManager\EventManager;
+
 class EventDebuggerManager extends EventManager
 {
     /** @var array */

@@ -20,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DebugRoutesCommand extends AbstractCommand
 {
+    protected const ROUTE_NAME = 'route_name';
+
     /** @var string Name of command */
     protected static $defaultName = 'debug:routes';
 
@@ -36,8 +38,8 @@ class DebugRoutesCommand extends AbstractCommand
         $routes = $definedRoutes = $this->getRoutes($input);
 
         // One single route in Input
-        if ($input->hasArgument('route_name') && isset($routes[$input->getArgument('route_name')])) {
-            $routes = $routes[$input->getArgument('route_name')];
+        if ($input->hasArgument(self::ROUTE_NAME) && isset($routes[$input->getArgument(self::ROUTE_NAME)])) {
+            $routes = $routes[$input->getArgument(self::ROUTE_NAME)];
         }
 
         // Display head
@@ -57,10 +59,10 @@ class DebugRoutesCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->addArgument('route_name', InputArgument::OPTIONAL, "The module route name.");
+            ->addArgument(self::ROUTE_NAME, InputArgument::OPTIONAL, "The module route name.");
         $this
             // The short description shown while running "php bin/console list"
-            ->setDescription("Debug routes from [route_name] or all routes.")
+            ->setDescription("Debug routes from [".self::ROUTE_NAME."] or all routes.")
             ->setHelp(
                 "This command allows you to show a list of all routes ans their associated controllers"
             );
@@ -117,15 +119,6 @@ class DebugRoutesCommand extends AbstractCommand
             );
         }
         $main .= $this->getPatternLine($leftSize, $centerSize, $rightSize) . PHP_EOL;
-    
-        // Check each route
-        foreach ($definedRoutes as $i => $route) {
-            /*$this->output->writeln([
-                "<comment>{$route['name']}</comment>",
-                "\t<info>Route: {$route['route']}</info>",
-                $route['default_controller'] ? "\tdefault: " . $route['default_controller'] : "\t-no default params",
-            ]);*/
-        }
         
         $this->output->writeln($head . $main);
     }
@@ -137,19 +130,17 @@ class DebugRoutesCommand extends AbstractCommand
      */
     protected function getRoutes(InputInterface $input): array
     {
-        $config    = $this->getConfig();
-        $router    = $this->getFoundChild('router', $config);
-        $allRoutes = $this->getFoundChild('routes', $router);
-        
-        if (! $allRoutes) {
-            throw new RuntimeException("Routes are not defined in configuration file.");
-        }
+        $config    = $this->getApplicationConfig();
+        $allRoutes = $this->getRoutesFromConfig($config);
 
         $routeStack = [];
-        $routeName  = $input->getArgument('route_name');
+        $routeName  = $input->getArgument(self::ROUTE_NAME);
 
-        // For a single defined route passed in Input
-        if ($routeName && isset($allRoutes[$routeName])) {
+        // Wrong argument
+        if ($routeName && !isset($allRoutes[$routeName])) {
+            throw new RuntimeException("Route $routeName doesn't exists.");
+        } elseif ($routeName && isset($allRoutes[$routeName])) {
+            // For a single defined route passed in Input
             $routeStack[] = $this->getData($routeName, $allRoutes[$routeName]);
         } else {
             // Return all routes
@@ -159,23 +150,6 @@ class DebugRoutesCommand extends AbstractCommand
         }
 
         return $routeStack;
-    }
-
-    /**
-     * Get container configuration
-     *
-     * @throws RuntimeException
-     */
-    protected function getConfig(): array
-    {
-        // Services
-        if (! $container = ContainerResolver::resolve()) {
-            throw new RuntimeException("Configuration file is not provided");
-        }
-        if (! $container->get('config')) {
-            throw new RuntimeException("Configuration data is not provided");
-        }
-        return $container->get('config');
     }
 
     /**

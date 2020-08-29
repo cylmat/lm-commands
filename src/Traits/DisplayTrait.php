@@ -16,13 +16,13 @@ trait DisplayTrait
     /**
      * Get rendered pattern line
      */
-    protected function getPatternLine(int $leftSize, int $centerSize, ?int $rightSize=null): string
+    protected function getPatternLine(int $leftSize, int $centerSize=null, ?int $rightSize=null): string
     {
         $cross = '+';
         $dash  = '-';
 
         return $cross . $this->repeatPattern($dash, $leftSize)
-                . $cross . $this->repeatPattern($dash, $centerSize)
+                . ($centerSize ? $cross . $this->repeatPattern($dash, $centerSize) : '') // Center
                 . ($rightSize ? $cross . $this->repeatPattern($dash, $rightSize) : '') // Right column
                 . $cross . PHP_EOL;
     }
@@ -32,14 +32,14 @@ trait DisplayTrait
      */
     protected function getTextLine(
         string $leftText, int $leftSize, 
-        string $centerText, int $centerSize,
+        string $centerText=null, int $centerSize=null,
         ?string $rightText=null, ?int $rightSize=null): string
     {
         $pipe = '|';
 
         return $pipe
                 . str_pad($leftText, $leftSize, ' ') . $pipe
-                . str_pad($centerText, $centerSize, ' ') . $pipe 
+                . ($centerSize ? str_pad($centerText, $centerSize, ' ') . $pipe : '') // Center
                 . ($rightSize ? str_pad($rightText, $rightSize, ' ') . $pipe : '') // Right column
                 . PHP_EOL;
     }
@@ -53,11 +53,33 @@ trait DisplayTrait
     }
 
     /**
+     * Get max propertie text size
+     * 
+     * @param int $type=0|1 Get max size from (0: keys or 1: values), default is 1 for values
+     */
+    protected function getMaxLength(array $array, int $type=1): int
+    {
+        $max = 0;
+        foreach ($array as $key => $value) {
+            if (0 === $type) {
+                if (strlen($key) > $max) {
+                    $max = strlen($key); 
+                }
+            } elseif (1 === $type) {
+                if (strlen($value) > $max) {
+                    $max = strlen($value); 
+                }
+            }
+        }
+        return $max;
+    }
+
+    /**
      * Display an error message to output
      */
     protected function sendError(string $message): void
     {
-        $message = "ERROR: $message";
+        $message = "ERROR: $message \n";
         $this->output->writeln($message);
     }
 }
