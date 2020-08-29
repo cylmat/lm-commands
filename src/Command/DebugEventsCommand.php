@@ -12,7 +12,6 @@
 namespace LmConsole\Command;
 
 use LmConsole\Command\DebugEvents\Factory;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
