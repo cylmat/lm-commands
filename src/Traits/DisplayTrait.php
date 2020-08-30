@@ -20,7 +20,8 @@ trait DisplayTrait
     {
         $subtitle = '=';
 
-        $this->output->writeln("\n<comment>$title</comment>");
+        $this->output->writeln(PHP_EOL); // First space
+        $this->output->writeln("<comment>$title</comment>");
         $this->output->writeln($this->repeatPattern($subtitle, strlen($title)));
     }
 
@@ -30,7 +31,9 @@ trait DisplayTrait
     public function displayTop($text): void
     {
         // Display event name
-        $top = PHP_EOL . ' [' . $text . ']' . PHP_EOL;
+        $this->output->writeln("");
+
+        $top = ' [' . $text . ']';
         $this->output->writeln($top);
     }
 
@@ -42,14 +45,33 @@ trait DisplayTrait
         string $centerText=null, int $centerSize=null, 
         string $rightText=null, int $rightSize=null): void
     {
-        $head = '';
-
         // Display head bar
-        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
-        $head .= $this->getTextLine($leftText, $leftSize, $centerText, $centerSize, $rightText, $rightSize);
-        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
+        $this->output->writeln($this->getPatternLine($leftSize, $centerSize, $rightSize));
+        $this->output->writeln($this->getTextLine($leftText, $leftSize, $centerText, $centerSize, $rightText, $rightSize));
+        $this->output->writeln($this->getPatternLine($leftSize, $centerSize, $rightSize));
+    }
 
-        $this->output->writeln($head);
+    /**
+     * Display columns row
+     */
+    public function displayRow(
+        string $leftText, int $leftSize, 
+        string $centerText=null, int $centerSize=null, 
+        string $rightText=null, int $rightSize=null): void
+    {
+        // Display line
+        $row = $this->getTextLine(" $leftText ", $leftSize, " $centerText ", $centerSize, " $rightText ", $rightSize);
+        $this->output->writeln($row);
+    }
+
+    /**
+     * Display columns footer
+     */
+    public function displayFooter(int $leftSize, int $centerSize=null, int $rightSize=null): void
+    {
+        // Display head bar
+        $foot =  $this->getPatternLine($leftSize, $centerSize, $rightSize);
+        $this->output->writeln($foot);
     }
 
     /* protected */
@@ -65,7 +87,7 @@ trait DisplayTrait
         return $cross . $this->repeatPattern($dash, $leftSize)
                 . ($centerSize ? $cross . $this->repeatPattern($dash, $centerSize) : '') // Center
                 . ($rightSize ? $cross . $this->repeatPattern($dash, $rightSize) : '') // Right column
-                . $cross . PHP_EOL;
+                . $cross;
     }
 
     /**
@@ -82,7 +104,7 @@ trait DisplayTrait
                 . str_pad($leftText, $leftSize, ' ') . $pipe
                 . ($centerSize ? str_pad($centerText, $centerSize, ' ') . $pipe : '') // Center
                 . ($rightSize ? str_pad($rightText, $rightSize, ' ') . $pipe : '') // Right column
-                . PHP_EOL;
+                ;
     }
 
     /**
