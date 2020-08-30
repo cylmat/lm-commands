@@ -1,9 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [0.3.0] - 2020-08-24
+## [Unreleased]
+- Module generator
+- Crud generator
+- Form creator
+
+## [0.3.0] 
 ### Added
 - Autoloading commands from modules
+- Global configuration loader
+- DebugEvents list option
+
+### Modified
+- Template of lists
 
 ## [0.2.0] - 2020-08-25
 ### Added
