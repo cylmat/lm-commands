@@ -22,10 +22,10 @@ You can include your own command from any module:
 
 Commands
 --------
-### Debug:routes [route]
+### Debug:routes [route_name]
 This command let you see the list of all routes used in your application.
 
-### Debug:events [route:'home'] [event]
-This command let you see the list of all events used in your application for a specific route.
-Default value is the home route 'home'.
-You can get information for a specific event.
+### Debug:events [url:'/'] [event_name]
+This command let you see the list events used in the application for a specific route.
+Default value is the home url '/'.
+You can get information for a specific event, or just list events with --list option

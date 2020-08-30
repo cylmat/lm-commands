@@ -62,7 +62,7 @@ class Template
         $head = $main = '';
         
         // Display head bar
-        $this->displayHead(" Priority ", $leftSize, " Callable ", $centerSize, " Default ", $rightSize);
+        $this->displayHead(" Route name ", $leftSize, " Route url ", $centerSize, " Default params", $rightSize);
         
         // Display routes properties
         foreach ($definedRoutes as $i => $route) {
