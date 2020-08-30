@@ -12,14 +12,15 @@
 namespace LmConsole\Command\DebugRoutes;
 
 use LmConsole\Config\GlobalConfigRetriever;
-use LmConsole\Traits\{ConfigTrait, ToolsTrait};
+use LmConsole\Config\ConfigRoutes;
+use LmConsole\Traits\ToolsTrait;
 use LmConsole\Command\DebugRoutesCommand;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 
 class Config
 {
-    use ConfigTrait, ToolsTrait;
+    use ToolsTrait;
 
     protected $input;
     
@@ -35,8 +36,8 @@ class Config
      */
     public function getRoutes(InputInterface $input): array
     {
-        $config    = $this->getContainerConfig();
-        $allRoutes = $this->getRoutesFromConfig($config);
+        $configRoutes = new ConfigRoutes;
+        $allRoutes = $configRoutes->getAllRoutes();
 
         $routeStack = [];
         $routeName  = $input->getArgument(DebugRoutesCommand::ROUTE_NAME);
