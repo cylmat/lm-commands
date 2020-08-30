@@ -55,7 +55,7 @@ class Template
     /**
      * Get template for one single event
      */
-    protected function getEventPropertiesTemplate(string $eventName, array $eventProperties): string
+    protected function getEventPropertiesTemplate(string $eventName, array $eventProperties): void
     {
         /*
          * info colors:  black, red, green, yellow, blue, magenta, cyan and white.
@@ -72,25 +72,22 @@ class Template
         $centerSize += 2; // count with '()' size
 
         // Display event name
-        //$head = "\n" . ' [' . $eventName . ']' . PHP_EOL;
         $this->displayTop($eventName);
 
         // Display head bar
-        $head = $this->displayHead(" Priority ", $leftSize, " Callable ", $centerSize);
+        $this->displayHead(" Priority ", $leftSize, " Callable ", $centerSize);
 
         // Display events properties
-        $main = '';
         foreach ($eventProperties as $priority => $callable) {
-            $main .= $this->getTextLine(" $priority ", $leftSize, " $callable ", $centerSize);
+            $this->displayRow($priority, $leftSize, $callable, $centerSize);
         }
-        $main .= $this->getPatternLine($leftSize, $centerSize) . PHP_EOL;
-        return $main;
+        $this->displayFooter($leftSize, $centerSize);
     }
 
     /**
      * Get template for a list of events with --list option
      */
-    protected function getEventListTemplate(array $eventList): string
+    protected function getEventListTemplate(array $eventList): void
     {
         /*
          * info colors:  black, red, green, yellow, blue, magenta, cyan and white.
@@ -105,19 +102,13 @@ class Template
         // Align with head
         $centerSize += 2; // count with '()' size
 
-        $head = '';
-
         // Display head bar
-        $head .= $this->getPatternLine($leftSize);
-        $head .= $this->getTextLine(" Name ", $leftSize);
-        $head .= $this->getPatternLine($leftSize);
+        $this->displayHead(" Name ", $leftSize);
 
         // Display events name
-        $main = '';
         foreach ($eventList as $name => $properties) {
-            $main .= $this->getTextLine(" $name ", $leftSize);
+            $this->displayRow($name, $leftSize);
         }
-        $main .= $this->getPatternLine($leftSize) . PHP_EOL;
-        return $head . $main;
+        $this->displayFooter($leftSize);
     }
 }

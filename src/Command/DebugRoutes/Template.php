@@ -62,22 +62,13 @@ class Template
         $head = $main = '';
         
         // Display head bar
-        $head = "\n";
-        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
-        $head .= $this->getTextLine(" Route ", $leftSize, " Url ", $centerSize, " Default ", $rightSize);
-        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
-
+        $this->displayHead(" Priority ", $leftSize, " Callable ", $centerSize, " Default ", $rightSize);
+        
         // Display routes properties
         foreach ($definedRoutes as $i => $route) {
             $default = $route['default_controller'] ? $route['default_controller'] : "no default params";
-            $main .= $this->getTextLine(
-                " {$route['name']} ", $leftSize, 
-                " {$route['route']} ", $centerSize,
-                " $default ", $rightSize
-            );
+            $this->displayRow($route['name'], $leftSize, $route['route'], $centerSize, $default, $rightSize);
         }
-        $main .= $this->getPatternLine($leftSize, $centerSize, $rightSize) . PHP_EOL;
-        
-        $this->output->writeln($head . $main);
+        $this->displayFooter($leftSize, $centerSize, $rightSize);
     }
 }
