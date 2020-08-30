@@ -22,18 +22,11 @@ class Config
     use ToolsTrait;
 
     /**
-     * Simulate an MVC application and get all Events on the dispatched url
+     * Get all Events on the dispatched url
      */
     public function getEventsFromUrl(?string $inputUrl, ?string $inputEventName): array
     {
-        $serviceConfig = $this->getServiceConfig();
-
-        // Launch application
-        $_SERVER['REQUEST_URI'] = $inputUrl ?? DebugEventsCommand::$defaultArguments[DebugEventsCommand::ROUTE_URL];
-
-        $appConfig = \LmConsole\Model\GlobalConfigRetriever::getApplicationConfig();
-        $appConfig = array_merge($appConfig, $serviceConfig);
-        $application = Application::init($appConfig)->run();
+        $application = $this->runApplicationInstance();
 
         // Get events
         $eventManager = $application->getEventManager(); //EventDebuggerManager
@@ -48,6 +41,27 @@ class Config
     }
     
     /* protected */
+
+    /**
+     * Simulate an MVC application
+     */
+    protected function runApplicationInstance(): object
+    {
+        $serviceConfig = $this->getServiceConfig();
+
+        // Launch application
+        $_SERVER['REQUEST_URI'] = $inputUrl ?? DebugEventsCommand::$defaultArguments[DebugEventsCommand::ROUTE_URL];
+
+        $appConfig = \LmConsole\Model\GlobalConfigRetriever::getApplicationConfig();
+        $appConfig = array_merge($appConfig, $serviceConfig);
+
+        // Avoid to print something
+        ob_start();
+        $application = Application::init($appConfig)->run();
+        ob_end_clean();
+
+        return $application;
+    }
     
     /**
      * Get Application configuration
