@@ -17,21 +17,22 @@ use DomainException;
 use Laminas\Cli\ContainerResolver;
 use Laminas\ServiceManager\ServiceManager;
 use ReflectionClass;
+use RuntimeException;
 
-class GlobalConfigRetriever
+class GlobalConfig
 {
-    private const GLOBAL_REDUNDANCE_AVOIDER = 'GLOBAL_REDUNDANCE_AVOIDER';
+    private const CONTAINER_LOADED = 'CONTAINER_LOADED';
 
     public static function isResolverLoaded(): bool
     {
-        if (! isset($GLOBALS[self::GLOBAL_REDUNDANCE_AVOIDER])) {
+        if (! isset($GLOBALS[self::CONTAINER_LOADED])) {
             return false;
         }
         return true;
     }
 
     /**
-     * Retrieve the config resolver
+     * Retrieve the config file
      */
     public static function getApplicationConfig(): array
     {
@@ -46,12 +47,12 @@ class GlobalConfigRetriever
     /**
      * Retrieve the config resolver
      */
-    public static function getGlobalConfig(): ?ServiceManager
+    public static function getGlobalServiceManager(): ?ServiceManager
     {
         /**
          * Avoid redundances with ContainerResolver::resolve()
          */
-        $GLOBALS[self::GLOBAL_REDUNDANCE_AVOIDER] = true;
+        $GLOBALS[self::CONTAINER_LOADED] = true;
 
         $config = ContainerResolver::resolve();
         $config = is_object($config) ? $config : null;
@@ -64,7 +65,7 @@ class GlobalConfigRetriever
      */
     public static function getModulesPath(): array
     {
-        $globalConfig = self::getGlobalConfig();
+        $globalConfig = self::getGlobalServiceManager();
 
         if (gettype($globalConfig) !== 'object') {
             return [];
@@ -91,6 +92,23 @@ class GlobalConfigRetriever
         }
 
         return $paths;
+    }
+
+    /**
+     * Get container configuration from all modules
+     *
+     * @throws RuntimeException
+     */
+    public static function getGlobalConfig(): array
+    {
+        // Services
+        if (! $container = ContainerResolver::resolve()) {
+            throw new RuntimeException("Configuration file is not provided");
+        }
+        if (! $config = $container->get('config')) {
+            throw new RuntimeException("Configuration data is not provided");
+        }
+        return $config;
     }
 
     /* private */

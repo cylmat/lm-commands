@@ -22,11 +22,11 @@ class ModuleCommandLoader
      */
     public static function getModulesCommands(): array
     {
-        if (GlobalConfigRetriever::isResolverLoaded()) {
+        if (GlobalConfig::isResolverLoaded()) {
             return [];
         }
 
-        $modulesPath  = GlobalConfigRetriever::getModulesPath();
+        $modulesPath  = GlobalConfig::getModulesPath();
         $commandsList = [];
 
         // Look into each module directory
