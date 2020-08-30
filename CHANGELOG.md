@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 - Crud generator
 - Form creator
 
-## [0.3.0] 
+## [0.3.0] - 30/08/2020
 ### Added
 - Autoloading commands from modules
 - Global configuration loader
