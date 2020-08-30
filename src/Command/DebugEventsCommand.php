@@ -47,8 +47,8 @@ class DebugEventsCommand extends AbstractCommand
         $inputEvent = $input->getArgument(self::EVENT_NAME);
         $listOpt = $input->getOption(self::LIST_OPT);
 
-        $config = Factory::getConfig();
-        $eventsList = $config->getEventsFromUrl($inputUrl, $inputEvent);
+        $configModel = Factory::getConfig();
+        $eventsList = $configModel->getEventsFromUrl($inputUrl, $inputEvent);
         
         $template = Factory::getTemplate($output);
 

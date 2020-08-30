@@ -26,15 +26,14 @@ class Config
      */
     public function getEventsFromUrl(?string $inputUrl, ?string $inputEventName): array
     {
-        $config        = require __DIR__ . '/../../../../config/application.config.php';
         $serviceConfig = $this->getServiceConfig();
-
-        $config = array_merge($config, $serviceConfig);
 
         // Launch application
         $_SERVER['REQUEST_URI'] = $inputUrl ?? DebugEventsCommand::$defaultArguments[DebugEventsCommand::ROUTE_URL];
-        $application = Application::init($config);
-        $application->run();
+
+        $appConfig = \LmConsole\Model\GlobalConfigRetriever::getApplicationConfig();
+        $appConfig = array_merge($appConfig, $serviceConfig);
+        $application = Application::init($appConfig)->run();
 
         // Get events
         $eventManager = $application->getEventManager(); //EventDebuggerManager

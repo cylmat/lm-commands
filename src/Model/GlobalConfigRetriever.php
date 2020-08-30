@@ -23,6 +23,35 @@ class GlobalConfigRetriever
     public const GLOBAL_REDUNDANCE_AVOIDER = 'GLOBAL_REDUNDANCE_AVOIDER';
 
     /**
+     * Retrieve the config resolver
+     */
+    public static function getApplicationConfig(): array
+    {
+        // Retrieve configuration
+        $appConfig = require 'config/application.config.php';
+        if (file_exists('config/development.config.php')) {
+            $appConfig = \Laminas\Stdlib\ArrayUtils::merge($appConfig, require 'config/development.config.php');
+        }
+        return $appConfig;
+    }
+
+    /**
+     * Retrieve the config resolver
+     */
+    public static function getGlobalConfig(): ?ServiceManager
+    {
+        /**
+         * Avoid redundances with ContainerResolver::resolve()
+         */
+        $GLOBALS[self::GLOBAL_REDUNDANCE_AVOIDER] = true;
+
+        $config = ContainerResolver::resolve();
+        $config = is_object($config) ? $config : null;
+
+        return $config;
+    }
+
+    /**
      * @throws DomainException When modules.config.php not found.
      * @todo Use laminas loader too
      */
@@ -79,18 +108,5 @@ class GlobalConfigRetriever
         }
 
         return include $path;
-    }
-    
-    /**
-     * Retrieve the config resolver
-     */
-    private static function getGlobalConfig(): ?ServiceManager
-    {
-        /**
-         * Avoid redundances with ContainerResolver::resolve()
-         */
-        $GLOBALS[self::GLOBAL_REDUNDANCE_AVOIDER] = true;
-        $config = ContainerResolver::resolve();
-        return is_object($config) ? $config : null;
     }
 }
