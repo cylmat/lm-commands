@@ -12,16 +12,15 @@
 namespace LmConsole\Command;
 
 use DomainException;
-use LmConsole\Traits\DisplayTrait;
-use LmConsole\Traits\ToolsTrait;
+use LmConsole\Traits\{DisplayTrait, ToolsTrait};
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractCommand extends Command
 {
-    use DisplayTrait;
-    use ToolsTrait;
+    // Traits
+    use DisplayTrait, ToolsTrait;
 
     /** @var InputInterface */
     protected $input;
@@ -52,16 +51,5 @@ class AbstractCommand extends Command
         $this->output = $output;
 
         return Command::FAILURE; // Default value
-    }
-
-    /**
-     * Display head
-     */
-    public function displayHead(string $title): void
-    {
-        $subtitle = '=';
-
-        $this->output->writeln("<comment>$title</comment>");
-        $this->output->writeln($this->repeatPattern($subtitle, strlen($title)));
     }
 }

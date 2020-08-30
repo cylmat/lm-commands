@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace LmConsole\Model;
+namespace LmConsole\Config;
 
 use Laminas\Code\Reflection\FileReflection;
 use LmConsole\Command\AbstractCommand;
@@ -22,7 +22,11 @@ class ModuleCommandLoader
      */
     public static function getModulesCommands(): array
     {
-        $modulesPath  = GlobalConfigRetriever::getModulesPath();
+        if (GlobalConfig::isResolverLoaded()) {
+            return [];
+        }
+
+        $modulesPath  = GlobalConfig::getModulesPath();
         $commandsList = [];
 
         // Look into each module directory

@@ -11,8 +11,8 @@
 
 namespace LmConsole\Command;
 
-use Laminas\Cli\ContainerResolver;
 use RuntimeException;
+use LmConsole\Command\DebugRoutes\Factory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DebugRoutesCommand extends AbstractCommand
 {
+    const ROUTE_NAME = 'route_name';
+
     /** @var string Name of command */
     protected static $defaultName = 'debug:routes';
 
@@ -33,18 +35,21 @@ class DebugRoutesCommand extends AbstractCommand
         parent::execute($input, $output);
 
         // All routes
-        $routes = $definedRoutes = $this->getRoutes($input);
+        $config = Factory::getConfig($input);
+        $routes = $definedRoutes = $config->getRoutes($input);
 
         // One single route in Input
-        if ($input->hasArgument('route_name') && isset($routes[$input->getArgument('route_name')])) {
-            $routes = $routes[$input->getArgument('route_name')];
+        if ($input->hasArgument(self::ROUTE_NAME) && isset($routes[$input->getArgument(self::ROUTE_NAME)])) {
+            $routes = $routes[$input->getArgument(self::ROUTE_NAME)];
         }
 
+        $template = Factory::getTemplate($output);
+
         // Display head
-        $this->displayHead("Routes of application");
+        $template->displayTitle("Routes of application");
         
         // Display routes
-        $this->displayRoutes($routes);
+        $template->displayRoutes($routes);
 
         return Command::SUCCESS;
     }
@@ -57,156 +62,12 @@ class DebugRoutesCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->addArgument('route_name', InputArgument::OPTIONAL, 'The module route name.');
+            ->addArgument(self::ROUTE_NAME, InputArgument::OPTIONAL, "The module route name.");
         $this
             // The short description shown while running "php bin/console list"
-            ->setDescription('Debug routes from [route_name] or all routes')
-            ->setHelp('This command allows you to show a list of all routes ans their associated controllers');
-    }
-
-    /**
-     * Display routes
-     */
-    protected function displayRoutes(array $definedRoutes): void
-    {
-        // Get size of columns
-        $leftSize = 40; //default value
-        $centerSize = 50;
-        $rightSize = 50;
-
-        foreach ($definedRoutes as $i => $route) {
-            // Left col with route name
-            $size = strlen($route['name']);
-            if ($size > $leftSize) {
-                $leftSize = $size;
-            }
-
-            // Center col with others data
-            $size = strlen($route['route']);
-            if ($size > $centerSize) {
-                $centerSize = $size;
-            }
-
-            $size = strlen($route['default_controller']);
-            if ($size > $rightSize) {
-                $rightSize = $size;
-            }
-        }
-
-        // Align with head
-        $leftSize += 2;
-        $centerSize += 2;
-        $rightSize += 2;
-
-        $head = $main = '';
-        
-        // Display head bar
-        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
-        $head .= $this->getTextLine(" Route ", $leftSize, " Url ", $centerSize, " Default ", $rightSize);
-        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
-
-        // Display routes properties
-        foreach ($definedRoutes as $i => $route) {
-            $default = $route['default_controller'] ? $route['default_controller'] : "no default params";
-            $main .= $this->getTextLine(
-                " {$route['name']} ", $leftSize, 
-                " {$route['route']} ", $centerSize,
-                " $default ", $rightSize
+            ->setDescription("Debug routes from [".self::ROUTE_NAME."] or all routes.")
+            ->setHelp(
+                "This command allows you to show a list of all routes ans their associated controllers"
             );
-        }
-        $main .= $this->getPatternLine($leftSize, $centerSize, $rightSize) . PHP_EOL;
-    
-        // Check each route
-        foreach ($definedRoutes as $i => $route) {
-            /*$this->output->writeln([
-                "<comment>{$route['name']}</comment>",
-                "\t<info>Route: {$route['route']}</info>",
-                $route['default_controller'] ? "\tdefault: " . $route['default_controller'] : "\t-no default params",
-            ]);*/
-        }
-        
-        $this->output->writeln($head . $main);
-    }
-
-    /**
-     * Get all routes from container configuration
-     *
-     * @throws RuntimeException
-     */
-    protected function getRoutes(InputInterface $input): array
-    {
-        $config    = $this->getConfig();
-        $router    = $this->getFoundChild('router', $config);
-        $allRoutes = $this->getFoundChild('routes', $router);
-        
-        if (! $allRoutes) {
-            throw new RuntimeException("Routes are not defined in configuration file.");
-        }
-
-        $routeStack = [];
-        $routeName  = $input->getArgument('route_name');
-
-        // For a single defined route passed in Input
-        if ($routeName && isset($allRoutes[$routeName])) {
-            $routeStack[] = $this->getData($routeName, $allRoutes[$routeName]);
-        } else {
-            // Return all routes
-            foreach ($allRoutes as $routeName => $routeData) {
-                $routeStack[] = $this->getData($routeName, $routeData);
-            }
-        }
-
-        return $routeStack;
-    }
-
-    /**
-     * Get container configuration
-     *
-     * @throws RuntimeException
-     */
-    protected function getConfig(): array
-    {
-        // Services
-        if (! $container = ContainerResolver::resolve()) {
-            throw new RuntimeException("Configuration file is not provided");
-        }
-        if (! $container->get('config')) {
-            throw new RuntimeException("Configuration data is not provided");
-        }
-        return $container->get('config');
-    }
-
-    /**
-     * Return route data
-     *
-     * @throws RuntimeException
-     */
-    protected function getData(string $routeName, array $routeData): array
-    {
-        if (! $routeData) {
-            throw new RuntimeException(sprintf('Missing route configuration in %s', $routeName));
-        }
-
-        $opt = $this->getFoundChild('options', $routeData);
-        if (! $opt) {
-            throw new RuntimeException(sprintf("Missing options configuration in %s", $routeName));
-        }
-
-        $route = $this->getFoundChild('route', $opt);
-
-        // Default options
-        $defaults = $this->getFoundChild('defaults', $opt);
-        $ctrl     = null;
-        if ($defaults) {
-            $ctrl   = $this->getFoundChild('controller', $defaults);
-            $action = $this->getFoundChild('action', $defaults);
-        }
-
-        // Return values
-        return [
-            'name'               => $routeName,
-            'route'              => $route,
-            'default_controller' => $ctrl ? $ctrl . '::' . $action : null,
-        ];
     }
 }

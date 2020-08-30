@@ -24,18 +24,17 @@ class DebugEventsCommandTest extends TestCase
         $this->command = new DebugEventsCommand;
         $this->output  = new BufferedOutput;
 
-        $this->definition = new InputDefinition([
-            new InputArgument('command', InputArgument::REQUIRED),
-            new InputArgument('route_name', InputArgument::OPTIONAL),
-            new InputArgument('event_name', InputArgument::OPTIONAL),
-        ]);
+        $this->definition = new InputDefinition(array_merge(
+            [new InputArgument('command', InputArgument::REQUIRED)],
+            $this->command->getDefinition()->getArguments(),
+            $this->command->getDefinition()->getOptions()
+        ));
     }
 
-    public function testExecute()
+    public function testDefault()
     {
         $input = new ArrayInput([
-            'command'    => 'debug:events',
-            'route_name' => '/test1'
+            'command'    => 'debug:events'
         ], $this->definition);
         
         $this->command->execute($input, $this->output);
@@ -48,7 +47,7 @@ class DebugEventsCommandTest extends TestCase
     {
         $input = new ArrayInput([
             'command'    => 'debug:events',
-            'route_name' => '/test1'
+            'route_url' => '/test1'
         ], $this->definition);
         
         $this->command->execute($input, $this->output);
@@ -61,13 +60,41 @@ class DebugEventsCommandTest extends TestCase
     {
         $input = new ArrayInput([
             'command'    => 'debug:events',
-            'route_name' => '/test1',
-            'event_name' => ''
+            'route_url' => '/test1',
+            'event_name' => 'bootstrap'
         ], $this->definition);
         
         $this->command->execute($input, $this->output);
         echo "\n" . $this->output->fetch();
 
-        $this->expectOutputRegex("/Priority | Callable/");
+        $this->expectOutputRegex("/\[bootstrap\]/");
+    }
+
+    public function testWithListOption()
+    {
+        $input = new ArrayInput([
+            'command'    => 'debug:events',
+            'route_url' => '/',
+            '--list' => true
+        ], $this->definition);
+        
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
+
+        $this->expectOutputRegex("/\| sendResponse   /");
+    }
+
+    public function testWithErrorEvent()
+    {
+        $input = new ArrayInput([
+            'command'    => 'debug:events',
+            'route_url' => '/test1',
+            'event_name' => 'a_bootstrap'
+        ], $this->definition);
+
+        $this->expectException(\RuntimeException::class);
+        
+        $this->command->execute($input, $this->output);
+        echo "\n" . $this->output->fetch();
     }
 }

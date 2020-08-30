@@ -2,6 +2,7 @@
 
 /**
  * Get global configuration file to retrieve list of all modules
+ * Used for autoloading Commands
  * 
  * @license https://opensource.org/licenses/MIT License
  *
@@ -9,25 +10,62 @@
  * file that was distributed with this source code.
  */
 
-namespace LmConsole\Model;
+namespace LmConsole\Config;
 
 use Composer\Autoload\ClassLoader;
 use DomainException;
 use Laminas\Cli\ContainerResolver;
 use Laminas\ServiceManager\ServiceManager;
 use ReflectionClass;
+use RuntimeException;
 
-class GlobalConfigRetriever
+class GlobalConfig
 {
-    public const GLOBAL_REDUNDANCE_AVOIDER = 'GLOBAL_REDUNDANCE_AVOIDER';
+    private const CONTAINER_LOADED = 'CONTAINER_LOADED';
+
+    public static function isResolverLoaded(): bool
+    {
+        if (! isset($GLOBALS[self::CONTAINER_LOADED])) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Retrieve the config file
+     */
+    public static function getApplicationConfig(): array
+    {
+        // Retrieve configuration
+        $appConfig = require 'config/application.config.php';
+        if (file_exists('config/development.config.php')) {
+            $appConfig = \Laminas\Stdlib\ArrayUtils::merge($appConfig, require 'config/development.config.php');
+        }
+        return $appConfig;
+    }
+
+    /**
+     * Retrieve the config resolver
+     */
+    public static function getGlobalServiceManager(): ?ServiceManager
+    {
+        /**
+         * Avoid redundances with ContainerResolver::resolve()
+         */
+        $GLOBALS[self::CONTAINER_LOADED] = true;
+
+        $config = ContainerResolver::resolve();
+        $config = is_object($config) ? $config : null;
+
+        return $config;
+    }
 
     /**
      * @throws DomainException When modules.config.php not found.
-     * @todo Use laminas loader too
      */
     public static function getModulesPath(): array
     {
-        $globalConfig = self::getGlobalConfig();
+        $globalConfig = self::getGlobalServiceManager();
 
         if (gettype($globalConfig) !== 'object') {
             return [];
@@ -56,6 +94,23 @@ class GlobalConfigRetriever
         return $paths;
     }
 
+    /**
+     * Get container configuration from all modules
+     *
+     * @throws RuntimeException
+     */
+    public static function getGlobalConfig(): array
+    {
+        // Services
+        if (! $container = ContainerResolver::resolve()) {
+            throw new RuntimeException("Configuration file is not provided");
+        }
+        if (! $config = $container->get('config')) {
+            throw new RuntimeException("Configuration data is not provided");
+        }
+        return $config;
+    }
+
     /* private */
 
     /**
@@ -78,18 +133,5 @@ class GlobalConfigRetriever
         }
 
         return include $path;
-    }
-    
-    /**
-     * Retrieve the config resolver
-     */
-    private static function getGlobalConfig(): ?ServiceManager
-    {
-        /**
-         * Avoid redundances with ContainerResolver::resolve()
-         */
-        $GLOBALS[self::GLOBAL_REDUNDANCE_AVOIDER] = true;
-        $config = ContainerResolver::resolve();
-        return is_object($config) ? $config : null;
     }
 }
