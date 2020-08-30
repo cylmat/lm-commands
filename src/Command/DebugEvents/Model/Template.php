@@ -72,7 +72,7 @@ class Template
         $centerSize += 2; // count with '()' size
 
         // Display event name
-        $head = ' [' . $eventName . ']' . PHP_EOL;
+        $head = "\n" . ' [' . $eventName . ']' . PHP_EOL;
 
         // Display head bar
         $head .= $this->getPatternLine($leftSize, $centerSize);

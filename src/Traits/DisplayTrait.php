@@ -14,6 +14,17 @@ namespace LmConsole\Traits;
 trait DisplayTrait
 {
     /**
+     * Display head
+     */
+    public function displayHead(string $title): void
+    {
+        $subtitle = '=';
+
+        $this->output->writeln("\n<comment>$title</comment>");
+        $this->output->writeln($this->repeatPattern($subtitle, strlen($title)));
+    }
+
+    /**
      * Get rendered pattern line
      */
     protected function getPatternLine(int $leftSize, int $centerSize=null, ?int $rightSize=null): string

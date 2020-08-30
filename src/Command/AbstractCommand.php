@@ -52,15 +52,4 @@ class AbstractCommand extends Command
 
         return Command::FAILURE; // Default value
     }
-
-    /**
-     * Display head
-     */
-    public function displayHead(string $title): void
-    {
-        $subtitle = '=';
-
-        $this->output->writeln("<comment>$title</comment>");
-        $this->output->writeln($this->repeatPattern($subtitle, strlen($title)));
-    }
 }

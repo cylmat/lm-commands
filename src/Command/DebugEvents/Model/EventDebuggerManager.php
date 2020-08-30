@@ -45,6 +45,7 @@ class EventDebuggerManager extends EventManager
 
             // Load each listeners
             foreach ($e_params as $e_priority => $e_listeners) {
+
                 // Load listener
                 $currentPriority = $e_priority;
                 foreach ($e_listeners as $e_listener) {
@@ -54,8 +55,9 @@ class EventDebuggerManager extends EventManager
                         // Object __invoke()
                         if (is_object($class)) {
                             $invokedClass                  = get_class($class) . '()';
-                            $events[$e_name][$e_priority] .= $invokedClass;
+                            $events[$e_name][$currentPriority++] .= $invokedClass;
                         } elseif (is_array($class)) {
+
                             // Array, events stacked
                             // Increment priority for each stacked event of same priority
                             foreach ($class as $n => $label) {

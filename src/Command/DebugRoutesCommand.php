@@ -105,6 +105,7 @@ class DebugRoutesCommand extends AbstractCommand
         $head = $main = '';
         
         // Display head bar
+        $head = "\n";
         $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
         $head .= $this->getTextLine(" Route ", $leftSize, " Url ", $centerSize, " Default ", $rightSize);
         $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
