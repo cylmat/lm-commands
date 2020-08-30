@@ -9,6 +9,8 @@
 
 namespace LmConsole;
 
+use LmConsole\Config\ModuleCommandLoader;
+
 class Module
 {
     public function getConfig(): array
@@ -20,12 +22,7 @@ class Module
 
     protected function getCliConfig(): array
     {
-        $commands = null;
-        if (! isset($GLOBALS[Model\GlobalConfigRetriever::GLOBAL_REDUNDANCE_AVOIDER])) {
-            $commands = Model\ModuleCommandLoader::getModulesCommands();
-        }
-
-        if (! $commands) {
+        if (! $commands = ModuleCommandLoader::getModulesCommands()) {
             return [];
         }
 
@@ -37,6 +34,7 @@ class Module
             $commandsList[ $key ] = $command;
         }
 
+        // List of all modules commands
         return [
             'commands' => $commandsList
         ];

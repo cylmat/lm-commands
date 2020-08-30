@@ -72,12 +72,11 @@ class Template
         $centerSize += 2; // count with '()' size
 
         // Display event name
-        $head = "\n" . ' [' . $eventName . ']' . PHP_EOL;
+        //$head = "\n" . ' [' . $eventName . ']' . PHP_EOL;
+        $this->displayTop($eventName);
 
         // Display head bar
-        $head .= $this->getPatternLine($leftSize, $centerSize);
-        $head .= $this->getTextLine(" Priority ", $leftSize, " Callable ", $centerSize);
-        $head .= $this->getPatternLine($leftSize, $centerSize);
+        $head = $this->displayHead(" Priority ", $leftSize, " Callable ", $centerSize);
 
         // Display events properties
         $main = '';
@@ -85,7 +84,7 @@ class Template
             $main .= $this->getTextLine(" $priority ", $leftSize, " $callable ", $centerSize);
         }
         $main .= $this->getPatternLine($leftSize, $centerSize) . PHP_EOL;
-        return $head . $main;
+        return $main;
     }
 
     /**

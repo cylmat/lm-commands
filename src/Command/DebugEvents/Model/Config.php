@@ -13,6 +13,7 @@ namespace LmConsole\Command\DebugEvents\Model;
 
 use Interop\Container\ContainerInterface;
 use Laminas\Mvc\Application;
+use LmConsole\Config\GlobalConfigRetriever;
 use LmConsole\Traits\ToolsTrait;
 use LmConsole\Command\DebugEventsCommand;
 use RuntimeException;
@@ -52,7 +53,7 @@ class Config
         // Launch application
         $_SERVER['REQUEST_URI'] = $inputUrl ?? DebugEventsCommand::$defaultArguments[DebugEventsCommand::ROUTE_URL];
 
-        $appConfig = \LmConsole\Model\GlobalConfigRetriever::getApplicationConfig();
+        $appConfig = GlobalConfigRetriever::getApplicationConfig();
         $appConfig = array_merge($appConfig, $serviceConfig);
 
         // Avoid to print something

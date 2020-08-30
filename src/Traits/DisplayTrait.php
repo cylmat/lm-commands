@@ -14,15 +14,45 @@ namespace LmConsole\Traits;
 trait DisplayTrait
 {
     /**
-     * Display head
+     * Display title ov command
      */
-    public function displayHead(string $title): void
+    public function displayTitle(string $title): void
     {
         $subtitle = '=';
 
         $this->output->writeln("\n<comment>$title</comment>");
         $this->output->writeln($this->repeatPattern($subtitle, strlen($title)));
     }
+
+    /**
+     * Display columns top
+     */
+    public function displayTop($text): void
+    {
+        // Display event name
+        $top = PHP_EOL . ' [' . $text . ']' . PHP_EOL;
+        $this->output->writeln($top);
+    }
+
+    /**
+     * Display columns head
+     */
+    public function displayHead(
+        string $leftText, int $leftSize, 
+        string $centerText=null, int $centerSize=null, 
+        string $rightText=null, int $rightSize=null): void
+    {
+        $head = '';
+
+        // Display head bar
+        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
+        $head .= $this->getTextLine($leftText, $leftSize, $centerText, $centerSize, $rightText, $rightSize);
+        $head .= $this->getPatternLine($leftSize, $centerSize, $rightSize);
+
+        $this->output->writeln($head);
+    }
+
+    /* protected */
 
     /**
      * Get rendered pattern line

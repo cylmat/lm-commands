@@ -22,7 +22,7 @@ trait ConfigTrait
      *
      * @throws RuntimeException
      */
-    protected function getApplicationConfig(): array
+    protected function getContainerConfig(): array
     {
         // Services
         if (! $container = ContainerResolver::resolve()) {

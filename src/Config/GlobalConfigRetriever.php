@@ -10,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-namespace LmConsole\Model;
+namespace LmConsole\Config;
 
 use Composer\Autoload\ClassLoader;
 use DomainException;
@@ -20,7 +20,15 @@ use ReflectionClass;
 
 class GlobalConfigRetriever
 {
-    public const GLOBAL_REDUNDANCE_AVOIDER = 'GLOBAL_REDUNDANCE_AVOIDER';
+    private const GLOBAL_REDUNDANCE_AVOIDER = 'GLOBAL_REDUNDANCE_AVOIDER';
+
+    public static function isResolverLoaded(): bool
+    {
+        if (! isset($GLOBALS[self::GLOBAL_REDUNDANCE_AVOIDER])) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Retrieve the config resolver
@@ -53,7 +61,6 @@ class GlobalConfigRetriever
 
     /**
      * @throws DomainException When modules.config.php not found.
-     * @todo Use laminas loader too
      */
     public static function getModulesPath(): array
     {

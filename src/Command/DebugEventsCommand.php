@@ -39,9 +39,6 @@ class DebugEventsCommand extends AbstractCommand
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         parent::execute($input, $output);
-        
-        // Display head
-        $this->displayHead("Events of application");
 
         $inputUrl = $input->getArgument(self::ROUTE_URL); //take '/' by default
         $inputEvent = $input->getArgument(self::EVENT_NAME);
@@ -51,6 +48,9 @@ class DebugEventsCommand extends AbstractCommand
         $eventsList = $configModel->getEventsFromUrl($inputUrl, $inputEvent);
         
         $template = Factory::getTemplate($output);
+
+        // Display head
+        $template->displayTitle("Events of application");
 
         // Options --list
         if ($listOpt) {
