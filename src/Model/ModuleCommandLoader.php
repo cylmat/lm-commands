@@ -28,17 +28,18 @@ class ModuleCommandLoader
         $cache = new CommandCache($cacheDir);
 
         $sha = self::getModulesSha();
+        $shaKey = 'shaModuleConfig';
 
         // Check for cache if modules list havn't changed
-        if($cache->has(1)) {
-            $cachedResult = $cache->get(1);
+        if($cache->has()) {
+            $cachedResult = $cache->get();
 
             // Remove what is not commands array
-            if(array_key_exists('shaModuleConfigFile', $cachedResult)) {
+            if(is_array($cachedResult) && array_key_exists($shaKey, $cachedResult)) {
 
                 // Return result only if sha doesn't changed (no modules changed)
-                if ($cachedResult['shaModuleConfigFile'] === $sha) {
-                    unset($cachedResult['shaModuleConfigFile']);
+                if ($cachedResult[$shaKey] === $sha) {
+                    unset($cachedResult[$shaKey]);
                     echo 'CAHCED';
                     return $cachedResult;
                 }
@@ -46,13 +47,11 @@ class ModuleCommandLoader
         }
 
         // Get list
-        $commandsList = self::getCommandsList();
+        $commandsList = $commandsListWithSha = self::getCommandsList();
+        $commandsListWithSha[$shaKey] = $sha;
 
         // Set in cache commands and sha
-        $cache->set(1, array_merge(
-            [$commandsList],
-            ['shaModuleConfigFile' => $sha]
-        ));
+        $cache->set($commandsListWithSha);
 
         return $commandsList;
     }

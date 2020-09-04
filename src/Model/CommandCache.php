@@ -40,9 +40,9 @@ class CommandCache
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
-    public function get($key, $default = null)
+    public function get()
     {
-        if (!$this->has(1)) {
+        if (!$this->has()) {
             return null;
         }
         return unserialize(file_get_contents($this->path));
@@ -62,7 +62,7 @@ class CommandCache
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
-    public function set($key, $value, $ttl = null)
+    public function set($value)
     {
         return file_put_contents($this->path, serialize($value));
     }
@@ -77,12 +77,22 @@ class CommandCache
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
-    public function delete($key)
+    public function delete()
     {
         if (file_exists($this->path)) {
             return unlink($this->path);
         }
         return false;
+    }
+
+    /**
+     * Wipes clean the entire cache's keys.
+     *
+     * @return bool True on success and false on failure.
+     */
+    public function clear()
+    {
+        $this->set('');
     }
     
     /**
@@ -100,7 +110,7 @@ class CommandCache
      * @throws \Psr\SimpleCache\InvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
-    public function has($key)
+    public function has()
     {
         if (file_exists($this->path)) {
             return true;
