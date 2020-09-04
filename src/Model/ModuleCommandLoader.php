@@ -27,6 +27,9 @@ class ModuleCommandLoader
         $cacheDir = GlobalConfig::getApplicationConfig()['cache_dir'];
         $cache = new CommandCache($cacheDir);
 
+        $sha = self::getModulesSha();
+        var_dump($sha);
+
         // Check for cache
         if($cache->has(1)) {
             $cachedResult = $cache->get(1);
@@ -92,5 +95,10 @@ class ModuleCommandLoader
         }
 
         return $commandsList;
+    }
+
+    protected static function getModulesSha()
+    {
+        $modulesList = GlobalConfig::getApplicationConfig()['modules'];
     }
 }
