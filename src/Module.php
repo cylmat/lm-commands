@@ -9,7 +9,7 @@
 
 namespace LmConsole;
 
-use LmConsole\Config\ModuleCommandLoader;
+use LmConsole\Model\ModuleCommandLoader;
 
 class Module
 {
@@ -22,16 +22,8 @@ class Module
 
     protected function getCliConfig(): array
     {
-        if (! $commands = ModuleCommandLoader::getModulesCommands()) {
+        if (! $commandsList = ModuleCommandLoader::getModulesCommands()) {
             return [];
-        }
-
-        // Get list of all modules commandes
-        // Retrieve COMMAND [arguments] list
-        $commandsList = [];
-        foreach ($commands as $command) {
-            $key                  = $command::getDefaultName(); 
-            $commandsList[ $key ] = $command;
         }
 
         // List of all modules commands
