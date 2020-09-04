@@ -28,24 +28,31 @@ class ModuleCommandLoader
         $cache = new CommandCache($cacheDir);
 
         $sha = self::getModulesSha();
-        var_dump($sha);
 
-        // Check for cache
+        // Check for cache if modules list havn't changed
         if($cache->has(1)) {
             $cachedResult = $cache->get(1);
 
             // Remove what is not commands array
             if(array_key_exists('shaModuleConfigFile', $cachedResult)) {
-                unset($cachedResult['shaModuleConfigFile']);
+
+                // Return result only if sha doesn't changed (no modules changed)
+                if ($cachedResult['shaModuleConfigFile'] === $sha) {
+                    unset($cachedResult['shaModuleConfigFile']);
+                    echo 'CAHCED';
+                    return $cachedResult;
+                }
             }
-            return $cachedResult;
         }
 
         // Get list
         $commandsList = self::getCommandsList();
 
-        // Set in cache
-        $cache->set(1, $commandsList);
+        // Set in cache commands and sha
+        $cache->set(1, array_merge(
+            [$commandsList],
+            ['shaModuleConfigFile' => $sha]
+        ));
 
         return $commandsList;
     }
@@ -97,8 +104,9 @@ class ModuleCommandLoader
         return $commandsList;
     }
 
-    protected static function getModulesSha()
+    protected static function getModulesSha(): string
     {
         $modulesList = GlobalConfig::getApplicationConfig()['modules'];
+        return sha1(serialize($modulesList));
     }
 }
