@@ -1,4 +1,4 @@
-lm-console
+lm-commands
 ==========
 Console commands for Laminas framework with Laminas-Cli.
 
